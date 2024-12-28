@@ -1,5 +1,8 @@
 import { Stage, Container } from '@pixi/react';
 import styled from 'styled-components';
+import { VirtualJoystick } from './components/VirtualJoystick';
+import { useController } from './hooks/useController';
+// import { useIsMobile } from './hooks/useIsMobile';
 
 const GameWrapper = styled.div`
   width: 800px;
@@ -13,6 +16,9 @@ interface GameEngineProps {
 }
 
 const GameEngine = ({ children, onBack }: GameEngineProps) => {
+  // const isMobile = useIsMobile();
+  const { handleInput } = useController();
+
   return (
     <GameWrapper>
       <Stage
@@ -32,6 +38,7 @@ const GameEngine = ({ children, onBack }: GameEngineProps) => {
       >
         Back to Menu
       </button>
+      <VirtualJoystick onInput={handleInput} />
     </GameWrapper>
   );
 };

@@ -14,9 +14,11 @@ interface GameSceneProps {
     isLevelComplete: boolean;
     onNextLevel: () => void;
     currentLevel: string;
+    projectiles: any[];
+    snowmen: any[];
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -146,6 +148,38 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                     </Container>
                 )}
             </Container>
+
+            {currentLevel === 'LEVEL_2' && (
+                <>
+                    {/* Render projectiles */}
+                    <Graphics
+                        draw={g => {
+                            g.clear();
+                            g.beginFill(0xFFFFFF);
+                            projectiles.forEach(p => {
+                                g.drawCircle(p.x, p.y, 10);
+                            });
+                            g.endFill();
+                        }}
+                    />
+                    
+                    {/* Render snowmen */}
+                    <Graphics
+                        draw={g => {
+                            g.clear();
+                            g.beginFill(0xFFFFFF);
+                            snowmen.forEach(s => {
+                                if (!s.hit) {
+                                    // Simple snowman shape
+                                    g.drawCircle(s.x, s.y, 20);
+                                    g.drawCircle(s.x, s.y - 30, 15);
+                                }
+                            });
+                            g.endFill();
+                        }}
+                    />
+                </>
+            )}
         </Container>
     );
 }; 

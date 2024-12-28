@@ -9,6 +9,7 @@ export interface PlayerState {
     jumpStartTime: number | null;
     currentJumpDirection: SwipeDirection;
     currentPlatform: Platform | null;
+    isShooting?: boolean;
 }
 
 export interface Platform {
@@ -56,4 +57,18 @@ export interface GameState {
 
 export interface LevelConfig extends PlatformConfig {
     goalScore: number;
+}
+
+export interface Projectile {
+    x: number;
+    y: number;
+    velocityX: number;
+    velocityY: number;
+    active: boolean;
+}
+
+export interface Snowman {
+    x: number;
+    y: number;
+    hit: boolean;
 } 

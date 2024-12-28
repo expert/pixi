@@ -18,6 +18,7 @@ import { HouseSystem } from '../core/systems/HouseSystem';
 import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entities/PlayerEntity';
 import { generatePlatforms, regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
 import { useLevel2State } from './hooks/useLevel2State';
+import { useLevel1State } from './hooks/useLevel1State';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -50,6 +51,11 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         score: gameState.score,
         goalScore: gameState.goalScore
     });
+    const [level1State, updateLevel1, handleLevel1Jump, initializeLevel1] = useLevel1State({
+        snowballs: [],
+        score: 0,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
+    });
     const resetLevel = (level: string) => {
         setLevelScroll(0);
         setPlatforms([]);
@@ -77,10 +83,10 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             : []
         );
         
-        setSnowballs(['LEVEL_1'].includes(level) 
-            ? SnowballSystem.generateSnowballs(_levelConfig) 
-            : []
-        );
+        if (level === 'LEVEL_1') {
+            initializeLevel1(_levelConfig);
+        }
+        
         setSnowmen(['LEVEL_2'].includes(level) 
             ? [SnowmanSystem.generateSnowman()] 
             : []
@@ -89,7 +95,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             ? [HouseSystem.generateHouse(800)] 
             : []
         );
-    }, []);
+    }, [initializeLevel1]);
 
     const handleNextLevel = useCallback(() => {
         const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'];
@@ -121,9 +127,9 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             handleLevel2Shot(player, newSwipeState);
         } else if (currentLevel === 'LEVEL_1') {
             setSwipeState(newSwipeState);
-            setPlayer(handleJumpPlayer(player, newSwipeState));
+            setPlayer(handleLevel1Jump(player, newSwipeState));
         }
-    }, [currentLevel, player, handleLevel2Shot]);
+    }, [currentLevel, player, handleLevel2Shot, handleLevel1Jump]);
 
     const updateGame = useCallback((deltaTime: number) => {
         if (gameState.isLevelComplete) return;
@@ -214,17 +220,13 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                     isLevelComplete: level2State.isLevelComplete
                 }));
             } else {
-                const { collectedSnowballs, remainingSnowballs } = 
-                    SnowballSystem.checkCollisions(player, snowballs, levelScroll);
-                
-                if (collectedSnowballs.length > 0) {
-                    setGameState(prev => ({
-                        ...prev,
-                        score: prev.score + collectedSnowballs.length,
-                        isLevelComplete: prev.score + collectedSnowballs.length >= prev.goalScore
-                    }));
-                    setSnowballs(remainingSnowballs);
-                }
+                updateLevel1(deltaTime, player, levelScroll);
+                setSnowballs(level1State.snowballs);
+                setGameState(prev => ({
+                    ...prev,
+                    score: level1State.score,
+                    isLevelComplete: level1State.isLevelComplete
+                }));
             }
 
             checkAndRegenerateContent();
@@ -244,7 +246,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             ...prev,
             timeElapsed: prev.timeElapsed + deltaTime
         }));
-    }, [currentLevel, platforms, levelScroll, snowballs, player, platformConfig.scrollSpeed, gameState.isLevelComplete, projectiles, snowmen, gifts, houses, checkAndRegenerateContent, updateLevel2]);
+    }, [currentLevel, platforms, levelScroll, player, platformConfig.scrollSpeed, 
+        gameState.isLevelComplete, updateLevel2, level2State, updateLevel1, level1State]);
 
     useGameLoop(updateGame);
 

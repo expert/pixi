@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { ShootingSystem } from '../../core/systems/ShootingSystem';
 import { SnowmanSystem } from '../../core/systems/SnowmanSystem';
-import { PlayerState, Projectile, Snowman, SwipeState, Platform  } from '../types';
+import { PlayerState, Projectile, Snowman, Platform  } from '../types';
+import { SwipeState } from '../../core/controllers/SwipeController';
 
 export const useLevel2State = (initialState: {
     projectiles: Projectile[];

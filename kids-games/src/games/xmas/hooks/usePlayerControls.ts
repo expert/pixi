@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { PlayerState } from '../types';
-import { INITIAL_JUMP_VELOCITY } from '../constants';
+import { PhysicsSystem } from '../systems/PhysicsSystem';
 
 export const usePlayerControls = (
     player: PlayerState,
@@ -9,30 +9,25 @@ export const usePlayerControls = (
 ) => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            setKeys(prev => new Set(prev).add(e.key));
-            
-            if (e.code === 'Space' && !player.isJumping) {
-                setPlayer({
-                    ...player,
-                    velocityY: INITIAL_JUMP_VELOCITY,
-                    isJumping: true,
-                    jumpStartTime: Date.now()
-                });
+            setKeys((prev: Set<string>) => new Set([...prev, e.key]));
+            console.log(e.code);
+            if (e.code === 'Space') {
+                setPlayer(prev => PhysicsSystem.startJump(prev));
             }
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
-            setKeys(prev => {
-                const newKeys = new Set(prev);
+            setKeys((prev: Set<string>) => {
+                const newKeys = new Set([...prev]);
                 newKeys.delete(e.key);
                 return newKeys;
             });
 
             if (e.code === 'Space' && player.isJumping && player.velocityY < 0) {
-                setPlayer({
-                    ...player,
-                    velocityY: player.velocityY * 0.5
-                });
+                setPlayer(prev => ({
+                    ...prev,
+                    velocityY: prev.velocityY * 0.5
+                }));
             }
         };
 

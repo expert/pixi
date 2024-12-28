@@ -19,6 +19,7 @@ import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from
 import { generatePlatforms, regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
 import { useLevel2State } from './hooks/useLevel2State';
 import { useLevel1State } from './hooks/useLevel1State';
+import { useLevel3State } from './hooks/useLevel3State';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -55,6 +56,11 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         snowballs: [],
         score: 0,
         goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
+    });
+    const [level3State, updateLevel3, updateLevel3Player] = useLevel3State({
+        gifts: [],
+        score: 0,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_3.goalScore
     });
     const resetLevel = (level: string) => {
         setLevelScroll(0);
@@ -188,27 +194,14 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 setPlayer(prev => ({ ...prev, dropGift: false }));
             }
         } else if (currentLevel === 'LEVEL_3') {
-            setPlayer(updateFlyPlayer(player, deltaTime));
-
-            setGifts(prev => {
-                const updatedGifts = GiftSystem.updateGifts(prev);
-                if (updatedGifts.length < 5 && GiftSystem.shouldGenerateNewGift()) {
-                    return [...updatedGifts, GiftSystem.generateGift()];
-                }
-                return updatedGifts;
-            });
-
-            const { collectedGifts, remainingGifts } = 
-                GiftSystem.checkCollisions(player.x, player.y, gifts);
-            
-            if (collectedGifts.length > 0) {
-                setGameState(prev => ({
-                    ...prev,
-                    score: prev.score + collectedGifts.length,
-                    isLevelComplete: prev.score + collectedGifts.length >= prev.goalScore
-                }));
-                setGifts(remainingGifts);
-            }
+            setPlayer(updateLevel3Player(player, deltaTime));
+            updateLevel3(deltaTime, player);
+            setGifts(level3State.gifts);
+            setGameState(prev => ({
+                ...prev,
+                score: level3State.score,
+                isLevelComplete: level3State.isLevelComplete
+            }));
         } else if (currentLevel === 'LEVEL_2' || currentLevel === 'LEVEL_1') {
             if (currentLevel === 'LEVEL_2') {
                 updateLevel2(deltaTime, platforms, levelScroll);
@@ -247,7 +240,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             timeElapsed: prev.timeElapsed + deltaTime
         }));
     }, [currentLevel, platforms, levelScroll, player, platformConfig.scrollSpeed, 
-        gameState.isLevelComplete, updateLevel2, level2State, updateLevel1, level1State]);
+        gameState.isLevelComplete, updateLevel2, level2State, updateLevel1, level1State, updateLevel3, level3State, updateLevel3Player]);
 
     useGameLoop(updateGame);
 

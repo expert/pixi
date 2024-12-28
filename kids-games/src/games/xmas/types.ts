@@ -71,4 +71,6 @@ export interface Snowman {
     x: number;
     y: number;
     hit: boolean;
+    createdAt: number;
+    duration: number;
 } 

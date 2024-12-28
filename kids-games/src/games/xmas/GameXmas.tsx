@@ -12,6 +12,7 @@ import { PlatformGenerator } from '../core/systems/PlatformGenerator';
 import { SnowballSystem } from '../core/systems/SnowballSystem';
 import { LevelSelector } from './components/LevelSelector';
 import { ShootingSystem } from '../core/systems/ShootingSystem';
+import { SnowmanSystem } from '../core/systems/SnowmanSystem';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -80,44 +81,69 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     useEffect(() => {
         if (levelConfig) {
             setPlatforms(PlatformGenerator.generateLevel(levelConfig));
-            setSnowballs(SnowballSystem.generateSnowballs(levelConfig));
+            if (currentLevel === 'LEVEL_2') {
+                setSnowmen([SnowmanSystem.generateSnowman()]);
+            } else {
+                setSnowballs(SnowballSystem.generateSnowballs(levelConfig));
+            }
         }
-    }, [levelConfig]);
+    }, [levelConfig, currentLevel]);
 
     const checkAndRegenerateContent = useCallback(() => {
-        const lastPlatform = platforms[platforms.length - 1];
-        
-        if (!gameState.isLevelComplete && 
-            lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
+        if (currentLevel === 'LEVEL_2') {
+            const lastPlatform = platforms[platforms.length - 1];
             
-            const visiblePlatforms = platforms.filter(p => 
-                p.x + p.width + levelScroll > -500
-            );
+            if (!gameState.isLevelComplete && 
+                lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
+                
+                const visiblePlatforms = platforms.filter(p => 
+                    p.x + p.width + levelScroll > -500
+                );
 
-            const visibleSnowballs = snowballs.filter(s => 
-                !s.collected && s.x + levelScroll > -500
-            );
+                const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+                const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+                    platformConfig.platformSpecs.minGap;
 
-            const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
-            const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
-                platformConfig.platformSpecs.minGap;
+                const newPlatforms = PlatformGenerator.generateLevel({
+                    ...platformConfig,
+                    levelWidth: newStartX + 2000,
+                    startX: newStartX
+                });
 
-            const newPlatforms = PlatformGenerator.generateLevel({
-                ...platformConfig,
-                levelWidth: newStartX + 2000,
-                startX: newStartX
-            });
+                setPlatforms(visiblePlatforms.concat(newPlatforms));
+            }
+        } else {
+            const lastPlatform = platforms[platforms.length - 1];
+            
+            if (!gameState.isLevelComplete && 
+                lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
+                
+                const visiblePlatforms = platforms.filter(p => 
+                    p.x + p.width + levelScroll > -500
+                );
 
-            const newSnowballs = SnowballSystem.generateSnowballs({
-                ...platformConfig,
-                levelWidth: newStartX + 2000,
-                startX: newStartX
-            });
+                const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+                const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+                    platformConfig.platformSpecs.minGap;
 
-            setPlatforms(visiblePlatforms.concat(newPlatforms));
-            setSnowballs(visibleSnowballs.concat(newSnowballs));
+                const newPlatforms = PlatformGenerator.generateLevel({
+                    ...platformConfig,
+                    levelWidth: newStartX + 2000,
+                    startX: newStartX
+                });
+
+                const newSnowmen = SnowmanSystem.generateSnowman();
+
+                setPlatforms(visiblePlatforms.concat(newPlatforms));
+                setSnowmen(prev => {
+                    const visibleSnowmen = prev.filter(s => 
+                        !s.hit && s.x + levelScroll > -500
+                    );
+                    return visibleSnowmen.concat(newSnowmen);
+                });
+            }
         }
-    }, [platforms, snowballs, levelScroll, gameState.isLevelComplete, platformConfig]);
+    }, [platforms, snowballs, levelScroll, gameState.isLevelComplete, platformConfig, currentLevel]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         if (currentLevel !== 'LEVEL_2') {
@@ -153,6 +179,16 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 prev.filter(p => p.active)
                    .map(p => ShootingSystem.updateProjectile(p, platforms, deltaTime))
             );
+
+            setSnowmen(prev => {
+                const updatedSnowmen = SnowmanSystem.updateSnowmen(prev);
+                
+                if (updatedSnowmen.length < 3 && SnowmanSystem.shouldGenerateNewSnowman()) {
+                    return [...updatedSnowmen, SnowmanSystem.generateSnowman()];
+                }
+                
+                return updatedSnowmen;
+            });
 
             const hitResults = ShootingSystem.checkSnowmanHits(projectiles, snowmen);
             if (hitResults.hits > 0) {

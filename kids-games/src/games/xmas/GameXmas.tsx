@@ -27,19 +27,18 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
-    const [platformConfig, setPlatformConfig] = useState<PlatformConfig>(
-        DEFAULT_PLATFORM_CONFIGS.VERTICAL
-    );
+    const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
+    const [levelScroll, setLevelScroll] = useState(0);
 
     useEffect(() => {
-        setPlatforms(PlatformGenerator.generatePlatforms(platformConfig));
+        setPlatforms(PlatformGenerator.generateLevel(platformConfig));
     }, [platformConfig]);
 
     const checkPlatformRegeneration = useCallback(() => {
         if (platformConfig.direction === 'horizontal') {
             const lastPlatform = platforms[platforms.length - 1];
             if (player.x > lastPlatform.x + lastPlatform.width) {
-                setPlatforms(PlatformGenerator.generatePlatforms(platformConfig));
+                setPlatforms(PlatformGenerator.generateLevel(platformConfig));
             }
         }
     }, [platforms, player.x, platformConfig]);
@@ -61,21 +60,34 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     }, [player.isJumping]);
 
     const updateGame = useCallback((deltaTime: number) => {
-        setPlatforms(prev => PlatformSystem.updatePlatforms(prev, deltaTime));
-        checkPlatformRegeneration();
+        setLevelScroll(prev => prev + DEFAULT_PLATFORM_CONFIGS.LEVEL_1.scrollSpeed * deltaTime);
 
-        setPlayer(prev => {
-            // Apply physics (including gravity and movement)
-            let newState = PhysicsSystem.updatePlayerPhysics(
-                prev,
-                platforms,
-                { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
-                deltaTime
-            );
+        setPlatforms(prev => prev.map(platform => {
+            if (!platform.isMoving) return platform;
 
-            return newState;
-        });
-    }, [platforms, checkPlatformRegeneration]);
+            const newX = platform.x + platform.speed! * platform.direction! * deltaTime;
+            
+            if (newX <= platform.startX! || newX >= platform.endX!) {
+                return {
+                    ...platform,
+                    x: newX <= platform.startX! ? platform.startX! : platform.endX!,
+                    direction: platform.direction! * -1 as 1 | -1
+                };
+            }
+
+            return {
+                ...platform,
+                x: newX
+            };
+        }));
+
+        setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
+            prev,
+            platforms,
+            { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
+            deltaTime
+        ));
+    }, [platforms]);
 
     useGameLoop(updateGame);
 
@@ -85,6 +97,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 platforms={platforms} 
                 player={player}
                 swipeState={swipeState}
+                levelScroll={levelScroll}
             />
             <JumpIndicator 
                 isVisible={player.isJumping}

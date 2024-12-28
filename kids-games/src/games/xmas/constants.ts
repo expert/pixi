@@ -80,23 +80,19 @@ export const JUMP_CONFIGS = {
 }; 
 
 export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
-    RUNNER: {
-        count: 5,
+    LEVEL_1: {
+        count: 20,
         direction: 'horizontal',
-        spacing: { min: 100, max: 200 },
-        height: { min: 100, max: 300 },
-        width: { min: 80, max: 120 },
-        speed: { min: 50, max: 150 },
-        moveDistance: { min: 100, max: 200 }
-    },
-    VERTICAL: {
-        count: 6,
-        direction: 'vertical',
-        spacing: { min: 80, max: 120 },
-        height: { min: 80, max: 120 },
-        width: { min: 80, max: 120 },
-        speed: { min: 50, max: 150 },
-        moveDistance: { min: 100, max: 200 }
+        scrollSpeed: -150, // Negative value means moving left
+        levelWidth: 5000,  // 5000 pixels wide level
+        platformSpecs: {
+            minWidth: 100,
+            maxWidth: 300,
+            minGap: 150,
+            maxGap: 300,
+            minHeight: 10,
+            maxHeight: 300
+        }
     }
 }; 
    

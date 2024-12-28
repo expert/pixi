@@ -20,29 +20,21 @@ export interface Platform {
     endX?: number;
     speed?: number;
     direction?: 1 | -1;
+    isScrolling?: boolean;
+    scrollSpeed?: number;
 }
 
 export interface PlatformConfig {
     count: number;
     direction: 'horizontal' | 'vertical';
-    spacing: {
-        min: number;
-        max: number;
-    };
-    height: {
-        min: number;
-        max: number;
-    };
-    width: {
-        min: number;
-        max: number;
-    };
-    speed: {
-        min: number;
-        max: number;
-    };
-    moveDistance: {
-        min: number;
-        max: number;
+    scrollSpeed: number;
+    levelWidth: number;  // Total width of the level
+    platformSpecs: {
+        minWidth: number;
+        maxWidth: number;
+        minGap: number;  // Minimum gap between platforms
+        maxGap: number;  // Maximum gap between platforms
+        minHeight: number;
+        maxHeight: number;
     };
 } 

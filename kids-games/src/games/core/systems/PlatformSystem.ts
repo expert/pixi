@@ -3,23 +3,32 @@ import { Platform } from '../../xmas/types';
 export class PlatformSystem {
     static updatePlatforms(platforms: Platform[], deltaTime: number): Platform[] {
         return platforms.map(platform => {
-            if (!platform.isMoving) return platform;
+            let newX = platform.x;
 
-            const newX = platform.x + (platform.speed! * platform.direction! * deltaTime);
+            // Handle individual platform movement
+            if (platform.isMoving) {
+                newX += platform.speed! * platform.direction! * deltaTime;
+                
+                // Change direction if reached bounds
+                if (newX <= platform.startX! || newX >= platform.endX!) {
+                    return {
+                        ...platform,
+                        x: newX <= platform.startX! ? platform.startX! : platform.endX!,
+                        direction: platform.direction! * -1 as 1 | -1
+                    };
+                }
+            }
 
-            if (newX <= platform.startX! || newX >= platform.endX!) {
-                return {
-                    ...platform,
-                    x: newX <= platform.startX! ? platform.startX! : platform.endX!,
-                    direction: platform.direction! * -1 as 1 | -1
-                };
+            // Handle level scrolling
+            if (platform.isScrolling) {
+                newX += platform.scrollSpeed! * deltaTime;
             }
 
             return {
                 ...platform,
                 x: newX
             };
-        });
+        }).filter(platform => platform.x + platform.width > -100); // Remove platforms that are off screen
     }
 
     static checkCollisions(x: number, y: number, velocityY: number, platforms: Platform[]): { 

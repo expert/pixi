@@ -9,8 +9,14 @@
       "request": "launch",
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}",
-      "runtimeArgs": ["--auto-open-devtools-for-tabs"],
+      "webRoot": "${workspaceFolder}",     
+     "runtimeArgs": ["--auto-open-devtools-for-tabs"],
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${workspaceFolder}/src/*",
+        "webpack://kids-games/src/*": "${workspaceFolder}/src/*",
+        "webpack:///./*": "${workspaceFolder}/*",
+        "webpack:///./~/*": "${workspaceFolder}/node_modules/*"
+      }
     }
   ]
 }

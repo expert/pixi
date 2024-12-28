@@ -9,8 +9,12 @@ export const useLevel2State = (initialState: {
     snowmen: Snowman[];
     score: number;
     goalScore: number;
+    isLevelComplete?: boolean;
 }) => {
-    const [state, setState] = useState(initialState);
+    const [state, setState] = useState({
+        ...initialState,
+        isLevelComplete: false
+    });
 
     const handleShot = (player: PlayerState, swipeState: SwipeState) => {
         if (swipeState.isActive && swipeState.endPoint) {

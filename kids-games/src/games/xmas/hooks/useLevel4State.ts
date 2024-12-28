@@ -9,8 +9,12 @@ export const useLevel4State = (initialState: {
     houses: House[];
     score: number;
     goalScore: number;
+    isLevelComplete?: boolean;
 }) => {
-    const [state, setState] = useState(initialState);
+    const [state, setState] = useState({
+        ...initialState,
+        isLevelComplete: false
+    });
 
     const updateLevel4 = (deltaTime: number, player: PlayerState) => {
         setState(prevState => {

@@ -7,8 +7,12 @@ export const useLevel1State = (initialState: {
     snowballs: Snowball[];
     score: number;
     goalScore: number;
+    isLevelComplete?: boolean;
 }) => {
-    const [state, setState] = useState(initialState);
+    const [state, setState] = useState({
+        ...initialState,
+        isLevelComplete: false
+    });
 
     const handleJump = (player: PlayerState, swipeState: SwipeState) => {
         return handleJumpPlayer(player, swipeState);

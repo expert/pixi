@@ -1,23 +1,17 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { PlayerState, Platform, PlatformConfig, Snowball, GameState, LevelConfig, Projectile, Snowman, Gift, House } from './types';
-import { PlatformSystem } from '../core/systems/PlatformSystem';
+import { PlayerState, Platform, PlatformConfig, Snowball, GameState, Projectile, Snowman, Gift, House } from './types';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
-import { INITIAL_PLATFORMS, PLAYER_SPEED, GROUND_Y, DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
+import { INITIAL_PLATFORMS, DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
 import { SwipeState, createSwipeState } from '../core/controllers/SwipeController';
 import { JumpIndicator } from './components/JumpIndicator';
-import { PlatformGenerator } from '../core/systems/PlatformGenerator';
-import { SnowballSystem } from '../core/systems/SnowballSystem';
 import { LevelSelector } from './components/LevelSelector';
-import { ShootingSystem } from '../core/systems/ShootingSystem';
-import { SnowmanSystem } from '../core/systems/SnowmanSystem';
-import { GiftSystem } from '../core/systems/GiftSystem';
-import { HouseSystem } from '../core/systems/HouseSystem';
-import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entities/PlayerEntity';
-import { generatePlatforms, regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
+import { createPlayer, handleFlyPlayer } from '../core/entities/PlayerEntity';
+import { regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
 
+import { useLevelManager } from './hooks/useLevelManager';
 import { useLevel1State } from './hooks/useLevel1State';
 import { useLevel2State } from './hooks/useLevel2State';
 import { useLevel3State } from './hooks/useLevel3State';
@@ -28,32 +22,6 @@ interface GameXmasProps {
 }
 
 const GameXmas = ({ onBack }: GameXmasProps) => {
-    const [currentLevel, setCurrentLevel] = useState<string | null>(null);
-    const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
-
-    const [player, setPlayer] = useState<PlayerState>(createPlayer());
-
-    const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
-    const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
-    const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
-    const [levelScroll, setLevelScroll] = useState(0);
-    const [snowballs, setSnowballs] = useState<Snowball[]>([]);
-    const [gameState, setGameState] = useState<GameState>({
-        score: 0,
-        timeElapsed: 0,
-        isLevelComplete: false,
-        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
-    });
-    const [projectiles, setProjectiles] = useState<Projectile[]>([]);
-    const [snowmen, setSnowmen] = useState<Snowman[]>([]);
-    const [gifts, setGifts] = useState<Gift[]>([]);
-    const [houses, setHouses] = useState<House[]>([]);
-    const [level2State, updateLevel2, handleLevel2Shot] = useLevel2State({
-        projectiles,
-        snowmen,
-        score: gameState.score,
-        goalScore: gameState.goalScore
-    });
     const [level1State, updateLevel1, handleLevel1Jump, initializeLevel1] = useLevel1State({
         snowballs: [],
         score: 0,
@@ -70,54 +38,49 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         score: 0,
         goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_4.goalScore
     });
-    const resetLevel = (level: string) => {
-        setLevelScroll(0);
-        setPlatforms([]);
-        setSnowballs([]);
-        setGifts([]);
-        setGameState({
-            score: 0,
-            timeElapsed: 0,
-            isLevelComplete: false,
-            goalScore: DEFAULT_LEVEL_CONFIGS[level].goalScore
-        });
+    const [level2State, updateLevel2, handleLevel2Shot] = useLevel2State({
+        projectiles: [],
+        snowmen: [],
+        score: 0,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_2.goalScore
+    });
 
-        setPlayer(createPlayer());
-    }
-    const handleLevelSelect = useCallback((level: string) => {
-        setCurrentLevel(level);
-        const _levelConfig = DEFAULT_LEVEL_CONFIGS[level];
-        setLevelConfig(_levelConfig);
+    const {
+        currentLevel,
+        levelConfig,
+        handleLevelSelect,
+        handleNextLevel
+    } = useLevelManager(initializeLevel1);
 
-        resetLevel(level);
-        if(!_levelConfig) return;
+    const [player, setPlayer] = useState<PlayerState>(createPlayer());
+    const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
+    const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
+    const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
+    const [levelScroll, setLevelScroll] = useState(0);
+    const [snowballs, setSnowballs] = useState<Snowball[]>([]);
+    const [projectiles, setProjectiles] = useState<Projectile[]>([]);
+    const [snowmen, setSnowmen] = useState<Snowman[]>([]);
+    const [gifts, setGifts] = useState<Gift[]>([]);
+    const [houses, setHouses] = useState<House[]>([]);
+    const [gameState, setGameState] = useState<GameState>({
+        score: 0,
+        timeElapsed: 0,
+        isLevelComplete: false,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
+    });
 
-        setPlatforms(['LEVEL_1', 'LEVEL_2'].includes(level) 
-            ? generatePlatforms(_levelConfig) 
-            : []
-        );
-        
-        if (level === 'LEVEL_1') {
-            initializeLevel1(_levelConfig);
-        }
-        
-        setSnowmen(['LEVEL_2'].includes(level) 
-            ? [SnowmanSystem.generateSnowman()] 
-            : []
-        );
-        setHouses(level === 'LEVEL_4' 
-            ? [HouseSystem.generateHouse(800)] 
-            : []
-        );
-    }, [initializeLevel1]);
-
-    const handleNextLevel = useCallback(() => {
-        const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'];
-        const currentIndex = levels.indexOf(currentLevel!);
-        if (currentIndex < levels.length - 1) {
-            handleLevelSelect(levels[currentIndex + 1]);
-        }
-    }, [currentLevel, handleLevelSelect]);
+    // When a level is selected, update all the state
+    const onLevelSelect = useCallback((level: string) => {
+        const newState = handleLevelSelect(level);
+        setPlayer(newState.player);
+        setPlatforms(newState.platforms);
+        setSnowballs(newState.snowballs);
+        setGifts(newState.gifts);
+        setLevelScroll(newState.levelScroll);
+        setGameState(newState.gameState);
+        setSnowmen(newState.snowmen);
+        setHouses(newState.houses);
+    }, [handleLevelSelect]);
 
     const checkAndRegenerateContent = useCallback(() => {
         switch (currentLevel) {
@@ -254,7 +217,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         return (
             <GameEngine onBack={onBack}>
                 <LevelSelector 
-                    onSelectLevel={handleLevelSelect}
+                    onSelectLevel={onLevelSelect}
                     onBack={onBack}
                 />
             </GameEngine>
@@ -291,3 +254,11 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 };
 
 export default GameXmas;
+
+function handleLevel2Shot(player: PlayerState, newSwipeState: SwipeState) {
+    throw new Error('Function not implemented.');
+}
+function updateLevel3Player(player: PlayerState, deltaTime: number): import("react").SetStateAction<PlayerState> {
+    throw new Error('Function not implemented.');
+}
+

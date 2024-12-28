@@ -7,8 +7,12 @@ export const useLevel3State = (initialState: {
     gifts: Gift[];
     score: number;
     goalScore: number;
+    isLevelComplete?: boolean;
 }) => {
-    const [state, setState] = useState(initialState);
+    const [state, setState] = useState({
+        ...initialState,
+        isLevelComplete: false
+    });
 
     const updateLevel3 = (deltaTime: number, player: PlayerState) => {
         setState(prevState => {

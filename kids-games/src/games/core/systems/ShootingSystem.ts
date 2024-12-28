@@ -1,4 +1,4 @@
-import { PlayerState, Projectile, Platform } from '../../xmas/types';
+import { PlayerState, Projectile, Platform, Snowman } from '../../xmas/types';
 import { SwipeState } from '../controllers/SwipeController';
 
 export class ShootingSystem {
@@ -7,10 +7,9 @@ export class ShootingSystem {
 
         const baseSpeed = Math.min(swipeState.magnitude * 2, 800);
         
-        // Calculate angle from swipe, swapped start and end points
         const dx = swipeState.startPoint.x - swipeState.endPoint.x;
         const dy = swipeState.startPoint.y - swipeState.endPoint.y;
-        const angle = Math.atan2(-dy, -dx); // Added negative to both dx and dy
+        const angle = Math.atan2(-dy, -dx);
 
         return {
             x: player.x,
@@ -65,5 +64,21 @@ export class ShootingSystem {
         });
 
         return { hits, remainingSnowmen };
+    }
+
+    static checkPlatformHits(projectiles: Projectile[], platforms: Platform[], levelScroll: number): Projectile[] {
+        return projectiles.map(projectile => {
+            if (!projectile.active) return projectile;
+            
+            const hitsPlatform = platforms.some(platform => {
+                const platformX = platform.x + levelScroll;
+                return projectile.x >= platformX && 
+                       projectile.x <= platformX + platform.width &&
+                       projectile.y >= platform.y && 
+                       projectile.y <= platform.y + 10;
+            });
+
+            return hitsPlatform ? { ...projectile, active: false } : projectile;
+        });
     }
 } 

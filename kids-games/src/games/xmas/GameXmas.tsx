@@ -175,10 +175,11 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         if (gameState.isLevelComplete) return;
 
         if (currentLevel === 'LEVEL_2') {
-            setProjectiles(prev => 
-                prev.filter(p => p.active)
-                   .map(p => ShootingSystem.updateProjectile(p, platforms, deltaTime))
-            );
+            setProjectiles(prev => {
+                const afterPlatformHits = ShootingSystem.checkPlatformHits(prev, platforms, levelScroll);
+                return afterPlatformHits.filter(p => p.active)
+                    .map(p => ShootingSystem.updateProjectile(p, platforms, deltaTime));
+            });
 
             setSnowmen(prev => {
                 const updatedSnowmen = SnowmanSystem.updateSnowmen(prev);

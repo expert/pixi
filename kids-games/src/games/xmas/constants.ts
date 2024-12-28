@@ -92,6 +92,13 @@ export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
             maxGap: 300,
             minHeight: 10,
             maxHeight: 300
+        },
+        snowballs: {
+            frequency: 0.3,    // 30% chance per platform
+            minSize: 20,
+            maxSize: 30,
+            minHeight: 50,     // Minimum height above platform
+            maxHeight: 100     // Maximum height above platform
         }
     }
 }; 

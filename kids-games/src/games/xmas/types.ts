@@ -37,4 +37,11 @@ export interface PlatformConfig {
         minHeight: number;
         maxHeight: number;
     };
+    snowballs: {
+        frequency: number;  // How often snowballs appear (0-1)
+        minSize: number;
+        maxSize: number;
+        minHeight: number;
+        maxHeight: number;
+    };
 } 

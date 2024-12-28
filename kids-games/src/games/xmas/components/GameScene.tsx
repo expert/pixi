@@ -1,5 +1,5 @@
-import { Container, Graphics } from '@pixi/react';
-import { Platform, PlayerState, SwipeState } from '../types';
+import { Container, Graphics, Text } from '@pixi/react';
+import { Platform, PlayerState, SwipeState, Snowball } from '../types';
 import { GROUND_Y } from '../constants';
 
 interface GameSceneProps {
@@ -7,9 +7,11 @@ interface GameSceneProps {
     player: PlayerState;
     swipeState: SwipeState;
     levelScroll: number;
+    snowballs: Snowball[];
+    score: number;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -32,6 +34,22 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll }: GameSc
                             g.drawRect(platform.x, platform.y, platform.width, 10);
                         });
                         g.endFill();
+                    }}
+                />
+            </Container>
+
+            {/* Snowballs container */}
+            <Container x={levelScroll}>
+                <Graphics
+                    draw={g => {
+                        g.clear();
+                        snowballs.forEach(snowball => {
+                            if (!snowball.collected) {
+                                g.beginFill(0xFFFFFF);
+                                g.drawCircle(snowball.x, snowball.y, snowball.size / 2);
+                                g.endFill();
+                            }
+                        });
                     }}
                 />
             </Container>
@@ -59,6 +77,17 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll }: GameSc
                     }}
                 />
             )}
+
+            {/* Score display */}
+            <Text 
+                text={`Score: ${score}`}
+                x={700}
+                y={10}
+                style={{
+                    fill: 0xFFFFFF,
+                    fontSize: 20
+                }}
+            />
         </Container>
     );
 }; 

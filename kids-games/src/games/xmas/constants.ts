@@ -23,4 +23,57 @@ export const INITIAL_PLATFORMS = [
         direction: -1
     },
 ]; 
+
+export const JUMP_CONFIGS = {
+  UP: {
+    verticalVelocity: -600,
+    horizontalVelocity: 0,
+    gravity: 1200,
+    airResistance: 0.1,
+    indicator: {
+      color: 0xFFFFFF,
+      rotation: 0
+    }
+  },
+  UP_LEFT: {
+    verticalVelocity: -500,
+    horizontalVelocity: -300,
+    gravity: 1000,
+    airResistance: 0.15,
+    indicator: {
+      color: 0xFFAA00,
+      rotation: -45
+    }
+  },
+  UP_RIGHT: {
+    verticalVelocity: -500,
+    horizontalVelocity: 300,
+    gravity: 1000,
+    airResistance: 0.15,
+    indicator: {
+      color: 0xFFAA00,
+      rotation: 45
+    }
+  },
+  DOWN: {
+    verticalVelocity: 300,
+    horizontalVelocity: 0,
+    gravity: 1500,
+    airResistance: 0.05,
+    indicator: {
+      color: 0xFF0000,
+      rotation: 180
+    }
+  },
+  NONE: {
+    verticalVelocity: 0,
+    horizontalVelocity: 0,
+    gravity: 1200,
+    airResistance: 0,
+    indicator: {
+      color: 0xCCCCCC,
+      rotation: 0
+    }
+  }
+}; 
    

@@ -1,13 +1,14 @@
 import { Container, Graphics } from '@pixi/react';
-import { Platform, PlayerState } from '../types';
+import { Platform, PlayerState, SwipeState } from '../types';
 import { GROUND_Y } from '../constants';
 
 interface GameSceneProps {
     platforms: Platform[];
     player: PlayerState;
+    swipeState: SwipeState;
 }
 
-export const GameScene = ({ platforms, player }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState }: GameSceneProps) => {
     return (
         <Container>
             <Graphics
@@ -29,6 +30,15 @@ export const GameScene = ({ platforms, player }: GameSceneProps) => {
                     g.beginFill(0xff0000);
                     g.drawRect(player.x - 25, player.y - 25, 50, 50);
                     g.endFill();
+
+                    // Draw swipe indicator when active
+                    if (swipeState.isActive && swipeState.startPoint) {
+                        g.lineStyle(2, 0xFFFFFF, 0.5);
+                        g.moveTo(swipeState.startPoint.x, swipeState.startPoint.y);
+                        if (swipeState.endPoint) {
+                            g.lineTo(swipeState.endPoint.x, swipeState.endPoint.y);
+                        }
+                    }
                 }}
             />
         </Container>

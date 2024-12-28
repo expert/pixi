@@ -1,3 +1,5 @@
+import { PlatformConfig } from "./types";
+
 export const PLAYER_SPEED = 200;
 export const GROUND_Y = 500;
 
@@ -75,5 +77,26 @@ export const JUMP_CONFIGS = {
       rotation: 0
     }
   }
+}; 
+
+export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
+    RUNNER: {
+        count: 5,
+        direction: 'horizontal',
+        spacing: { min: 100, max: 200 },
+        height: { min: 100, max: 300 },
+        width: { min: 80, max: 120 },
+        speed: { min: 50, max: 150 },
+        moveDistance: { min: 100, max: 200 }
+    },
+    VERTICAL: {
+        count: 6,
+        direction: 'vertical',
+        spacing: { min: 80, max: 120 },
+        height: { min: 80, max: 120 },
+        width: { min: 80, max: 120 },
+        speed: { min: 50, max: 150 },
+        moveDistance: { min: 100, max: 200 }
+    }
 }; 
    

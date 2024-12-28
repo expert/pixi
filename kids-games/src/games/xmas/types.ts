@@ -20,4 +20,29 @@ export interface Platform {
     endX?: number;
     speed?: number;
     direction?: 1 | -1;
+}
+
+export interface PlatformConfig {
+    count: number;
+    direction: 'horizontal' | 'vertical';
+    spacing: {
+        min: number;
+        max: number;
+    };
+    height: {
+        min: number;
+        max: number;
+    };
+    width: {
+        min: number;
+        max: number;
+    };
+    speed: {
+        min: number;
+        max: number;
+    };
+    moveDistance: {
+        min: number;
+        max: number;
+    };
 } 

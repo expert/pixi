@@ -1,13 +1,14 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { PlayerState, Platform } from './types';
+import { PlayerState, Platform, PlatformConfig } from './types';
 import { PlatformSystem } from '../core/systems/PlatformSystem';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
-import { INITIAL_PLATFORMS, PLAYER_SPEED, GROUND_Y } from './constants';
+import { INITIAL_PLATFORMS, PLAYER_SPEED, GROUND_Y, DEFAULT_PLATFORM_CONFIGS } from './constants';
 import { SwipeState, createSwipeState } from '../core/controllers/SwipeController';
 import { JumpIndicator } from './components/JumpIndicator';
+import { PlatformGenerator } from '../core/systems/PlatformGenerator';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -26,6 +27,22 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
+    const [platformConfig, setPlatformConfig] = useState<PlatformConfig>(
+        DEFAULT_PLATFORM_CONFIGS.VERTICAL
+    );
+
+    useEffect(() => {
+        setPlatforms(PlatformGenerator.generatePlatforms(platformConfig));
+    }, [platformConfig]);
+
+    const checkPlatformRegeneration = useCallback(() => {
+        if (platformConfig.direction === 'horizontal') {
+            const lastPlatform = platforms[platforms.length - 1];
+            if (player.x > lastPlatform.x + lastPlatform.width) {
+                setPlatforms(PlatformGenerator.generatePlatforms(platformConfig));
+            }
+        }
+    }, [platforms, player.x, platformConfig]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         setSwipeState(newSwipeState);
@@ -45,6 +62,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     const updateGame = useCallback((deltaTime: number) => {
         setPlatforms(prev => PlatformSystem.updatePlatforms(prev, deltaTime));
+        checkPlatformRegeneration();
 
         setPlayer(prev => {
             // Apply physics (including gravity and movement)
@@ -57,7 +75,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
             return newState;
         });
-    }, [platforms]);
+    }, [platforms, checkPlatformRegeneration]);
 
     useGameLoop(updateGame);
 

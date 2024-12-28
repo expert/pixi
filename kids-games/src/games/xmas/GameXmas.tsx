@@ -15,7 +15,7 @@ import { ShootingSystem } from '../core/systems/ShootingSystem';
 import { SnowmanSystem } from '../core/systems/SnowmanSystem';
 import { GiftSystem } from '../core/systems/GiftSystem';
 import { HouseSystem } from '../core/systems/HouseSystem';
-import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entites/PlayerEntity';
+import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entities/PlayerEntity';
 import { generatePlatforms, regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
 
 interface GameXmasProps {   
@@ -101,7 +101,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                     const visibleSnowmen = prev.filter(s => 
                         !s.hit && s.x + levelScroll > -500
                     );
-                    return visibleSnowmen;
+                    return visibleSnowmen; 
                 });
             }
         }

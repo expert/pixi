@@ -120,59 +120,81 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     }, [currentLevel, handleLevelSelect]);
 
     const checkAndRegenerateContent = useCallback(() => {
-        if (currentLevel === 'LEVEL_1' || currentLevel === 'LEVEL_2') {
-            setPlatforms(prev => regeneratePlatforms(prev, levelScroll, platformConfig));
+        switch (currentLevel) {
+            case 'LEVEL_1':
+                setPlatforms(prev => 
+                    regeneratePlatforms(prev, levelScroll, platformConfig)
+                );
+                break;
             
-            if (currentLevel === 'LEVEL_2') {
-                setSnowmen(prev => {
-                    const visibleSnowmen = prev.filter(s => 
-                        !s.hit && s.x + levelScroll > -500
-                    );
-                    return visibleSnowmen; 
-                });
-            }
+            case 'LEVEL_2':
+                setPlatforms(prev => 
+                    regeneratePlatforms(prev, levelScroll, platformConfig)
+                );
+                setSnowmen(prev => prev.filter(s => 
+                    !s.hit && s.x + levelScroll > -500
+                ));
+                break;
         }
-    }, [currentLevel, levelScroll, platformConfig]);
+    }, [
+        currentLevel, 
+        levelScroll, 
+        platformConfig
+    ]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
-        if (currentLevel === 'LEVEL_3' || currentLevel === 'LEVEL_4') {
-            setPlayer(handleFlyPlayer(player, newSwipeState));
-        } else if (currentLevel === 'LEVEL_2') {
-            handleLevel2Shot(player, newSwipeState);
-        } else if (currentLevel === 'LEVEL_1') {
-            setSwipeState(newSwipeState);
-            setPlayer(handleLevel1Jump(player, newSwipeState));
+        switch (currentLevel) {
+            case 'LEVEL_1':
+                setSwipeState(newSwipeState);
+                setPlayer(handleLevel1Jump(player, newSwipeState));
+                break;
+            
+            case 'LEVEL_2':
+                handleLevel2Shot(player, newSwipeState);
+                break;
+            
+            case 'LEVEL_3':
+            case 'LEVEL_4':
+                setPlayer(handleFlyPlayer(player, newSwipeState));
+                break;
         }
-    }, [currentLevel, player, handleLevel2Shot, handleLevel1Jump]);
+    }, [
+        currentLevel, 
+        player, 
+        handleLevel2Shot, 
+        handleLevel1Jump
+    ]);
 
     const updateGame = useCallback((deltaTime: number) => {
         if (gameState.isLevelComplete) return;
 
-        if (currentLevel === 'LEVEL_4') {
-            setPlayer(updateLevel4Player(player, deltaTime));
-            updateLevel4(deltaTime, player);
-            setHouses(level4State.houses);
-            setGifts(level4State.gifts);
-            setGameState(prev => ({
-                ...prev,
-                score: level4State.score,
-                isLevelComplete: level4State.isLevelComplete
-            }));
-            
-            if (player.dropGift) {
-                setPlayer(prev => ({ ...prev, dropGift: false }));
-            }
-        } else if (currentLevel === 'LEVEL_3') {
-            setPlayer(updateLevel3Player(player, deltaTime));
-            updateLevel3(deltaTime, player);
-            setGifts(level3State.gifts);
-            setGameState(prev => ({
-                ...prev,
-                score: level3State.score,
-                isLevelComplete: level3State.isLevelComplete
-            }));
-        } else if (currentLevel === 'LEVEL_2' || currentLevel === 'LEVEL_1') {
-            if (currentLevel === 'LEVEL_2') {
+        // Common platform-based level updates
+        const updatePlatformBasedLevel = () => {
+            checkAndRegenerateContent();
+            setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
+            setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig.scrollSpeed));
+            setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
+                prev,
+                platforms,
+                { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
+                deltaTime,
+                levelScroll
+            ));
+        };
+
+        switch (currentLevel) {
+            case 'LEVEL_1':
+                updateLevel1(deltaTime, player, levelScroll);
+                setSnowballs(level1State.snowballs);
+                setGameState(prev => ({
+                    ...prev,
+                    score: level1State.score,
+                    isLevelComplete: level1State.isLevelComplete
+                }));
+                updatePlatformBasedLevel();
+                break;
+
+            case 'LEVEL_2':
                 updateLevel2(deltaTime, platforms, levelScroll);
                 setProjectiles(level2State.projectiles);
                 setSnowmen(level2State.snowmen);
@@ -181,35 +203,50 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                     score: level2State.score,
                     isLevelComplete: level2State.isLevelComplete
                 }));
-            } else {
-                updateLevel1(deltaTime, player, levelScroll);
-                setSnowballs(level1State.snowballs);
+                updatePlatformBasedLevel();
+                break; 
+
+            case 'LEVEL_3':
+                setPlayer(updateLevel3Player(player, deltaTime));
+                updateLevel3(deltaTime, player);
+                setGifts(level3State.gifts);
                 setGameState(prev => ({
                     ...prev,
-                    score: level1State.score,
-                    isLevelComplete: level1State.isLevelComplete
+                    score: level3State.score,
+                    isLevelComplete: level3State.isLevelComplete
                 }));
-            }
+                break;
 
-            checkAndRegenerateContent();
-            setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
-            setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig.scrollSpeed));
+            case 'LEVEL_4':
+                setPlayer(updateLevel4Player(player, deltaTime));
+                updateLevel4(deltaTime, player);
+                setHouses(level4State.houses);
+                setGifts(level4State.gifts);
+                setGameState(prev => ({
+                    ...prev,
+                    score: level4State.score,
+                    isLevelComplete: level4State.isLevelComplete
+                }));
+                if (player.dropGift) {
+                    setPlayer(prev => ({ ...prev, dropGift: false }));
+                }
+                break;
 
-            setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
-                prev,
-                platforms,
-                { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
-                deltaTime,
-                levelScroll
-            ));
         }
 
         setGameState(prev => ({
             ...prev,
             timeElapsed: prev.timeElapsed + deltaTime
         }));
-    }, [currentLevel, platforms, levelScroll, player, platformConfig.scrollSpeed, 
-        gameState.isLevelComplete, updateLevel2, level2State, updateLevel1, level1State, updateLevel3, level3State, updateLevel3Player]);
+    }, [
+        currentLevel, platforms, levelScroll, player, platformConfig.scrollSpeed,
+        gameState.isLevelComplete, 
+        updateLevel1, level1State,
+        updateLevel2, level2State,
+        updateLevel3, level3State, updateLevel3Player,
+        updateLevel4, level4State, updateLevel4Player,
+        checkAndRegenerateContent
+    ]);
 
     useGameLoop(updateGame);
 

@@ -30,14 +30,18 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         setSwipeState(newSwipeState);
         
-        if (newSwipeState.isActive && newSwipeState.direction !== 'NONE') {
+        if (newSwipeState.isActive && 
+            newSwipeState.direction !== 'NONE' && 
+            newSwipeState.endPoint && 
+            !player.isJumping) {
+            console.log('Triggering jump:', newSwipeState.direction, newSwipeState.magnitude);
             setPlayer(prev => PhysicsSystem.startDirectionalJump(
                 prev,
                 newSwipeState.direction,
                 newSwipeState.magnitude
             ));
         }
-    }, []);
+    }, [player.isJumping]);
 
     const updateGame = useCallback((deltaTime: number) => {
         setPlatforms(prev => PlatformSystem.updatePlatforms(prev, deltaTime));

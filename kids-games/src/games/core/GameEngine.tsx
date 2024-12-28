@@ -1,5 +1,6 @@
 import { Stage, Container } from '@pixi/react';
 import styled from 'styled-components';
+import { useState, useCallback } from 'react';
 import { 
     SwipeState, 
     createSwipeState, 
@@ -21,33 +22,60 @@ interface GameEngineProps {
 }
 
 const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
         const touch = e.touches[0];
-        onSwipe({
+        const rect = e.currentTarget.getBoundingClientRect();
+        const newState = {
             isActive: true,
-            startPoint: { x: touch.clientX, y: touch.clientY },
+            startPoint: { 
+                x: touch.clientX - rect.left, 
+                y: touch.clientY - rect.top 
+            },
             endPoint: null,
             direction: 'NONE',
             magnitude: 0
-        });
-    };
+        };
+        setSwipeState(newState);
+        onSwipe(newState);
+    }, [onSwipe]);
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-        if (e.touches.length === 0) return;
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        if (!swipeState.isActive || !swipeState.startPoint) return;
+
         const touch = e.touches[0];
-        const currentPoint = { x: touch.clientX, y: touch.clientY };
+        const rect = e.currentTarget.getBoundingClientRect();
+        const currentPoint = { 
+            x: touch.clientX - rect.left, 
+            y: touch.clientY - rect.top 
+        };
         
-        onSwipe(prev => ({
-            ...prev,
-            endPoint: currentPoint,
-            direction: calculateSwipeDirection(prev.startPoint!, currentPoint),
-            magnitude: calculateSwipeMagnitude(prev.startPoint!, currentPoint)
-        }));
-    };
+        const direction = calculateSwipeDirection(swipeState.startPoint, currentPoint);
+        const magnitude = calculateSwipeMagnitude(swipeState.startPoint, currentPoint);
 
-    const handleTouchEnd = () => {
-        onSwipe(createSwipeState());
-    };
+        const newState = {
+            ...swipeState,
+            endPoint: currentPoint,
+            direction,
+            magnitude
+        };
+
+        setSwipeState(newState);
+        onSwipe(newState);
+    }, [swipeState, onSwipe]);
+
+    const handleTouchEnd = useCallback(() => {
+        if (swipeState.isActive && swipeState.direction !== 'NONE') {
+            // Trigger the jump with final swipe state
+            onSwipe(swipeState);
+        }
+        
+        // Reset swipe state
+        const newState = createSwipeState();
+        setSwipeState(newState);
+        onSwipe(newState);
+    }, [swipeState, onSwipe]);
 
     return (
         <GameWrapper

@@ -22,34 +22,48 @@ export class PhysicsSystem {
         player: PlayerState,
         platforms: Platform[],
         inputState: InputState,
-        deltaTime: number
+        deltaTime: number,
+        levelScroll: number
     ): PlayerState {
         let newState = { ...player };
         const jumpConfig = JUMP_CONFIGS[player.currentJumpDirection];
 
-        // If player is on a platform, stick to it unless jumping
+        // If player is on a platform, move with it unless jumping
         if (player.currentPlatform && !player.isJumping) {
-            // Find the current platform state by position range (since platform x changes)
+            // Find the current platform state
             const updatedPlatform = platforms.find(p => 
-                p.y === player.currentPlatform!.y && // Same height
-                Math.abs(p.x - player.currentPlatform!.x) < 5 && // Similar x position
-                p.width === player.currentPlatform!.width // Same platform
+                p.y === player.currentPlatform!.y && 
+                Math.abs((p.x + levelScroll) - (player.currentPlatform!.x + levelScroll)) < 5 && 
+                p.width === player.currentPlatform!.width
             );
             
-            if (updatedPlatform && updatedPlatform.isMoving) {
-                // Update player position with current platform movement
+            if (updatedPlatform) {
+                // Calculate platform movement
+                let platformDeltaX = 0;
+                if (updatedPlatform.isMoving) {
+                    platformDeltaX = updatedPlatform.speed! * updatedPlatform.direction! * deltaTime;
+                }
+
+                // Apply strong friction when on platform
+                newState.velocityX *= Math.max(0, 1 - 10 * deltaTime); // Increased friction
+
+                // Calculate new position with reduced sliding
+                const relativeX = player.x - (updatedPlatform.x + levelScroll);
                 newState = {
                     ...newState,
-                    x: newState.x + updatedPlatform.speed! * updatedPlatform.direction! * deltaTime,
+                    x: updatedPlatform.x + levelScroll + relativeX + platformDeltaX,
                     y: updatedPlatform.y - 25,
                     velocityY: 0,
-                    velocityX: 0,
                     currentPlatform: updatedPlatform
                 };
+
+                // Keep player within platform bounds
+                const minX = updatedPlatform.x + levelScroll + 25;
+                const maxX = updatedPlatform.x + levelScroll + updatedPlatform.width - 25;
+                newState.x = Math.max(minX, Math.min(maxX, newState.x));
+
                 return newState;
             }
-            // If on static platform, just stay put
-            return newState;
         }
 
         // Apply gravity
@@ -64,7 +78,7 @@ export class PhysicsSystem {
         newState.x += newState.velocityX * deltaTime;
         newState.y += newState.velocityY * deltaTime;
 
-        // Keep player within bounds
+        // Keep player within screen bounds
         newState.x = Math.max(25, Math.min(775, newState.x));
 
         // Check ground collision
@@ -82,11 +96,12 @@ export class PhysicsSystem {
         }
 
         // Check platform collisions
-        const collision = PhysicsSystem.checkPlatformCollision(
+        const collision = this.checkPlatformCollision(
             newState.x,
             newState.y,
             newState.velocityY,
-            platforms
+            platforms,
+            levelScroll
         );
 
         // Apply collision results
@@ -108,7 +123,8 @@ export class PhysicsSystem {
         x: number,
         y: number,
         velocityY: number,
-        platforms: Platform[]
+        platforms: Platform[],
+        levelScroll: number
     ): { 
         newY: number;
         newVelocityY: number;
@@ -127,16 +143,21 @@ export class PhysicsSystem {
             };
         }
 
-        // Then check platform collisions
+        // Then check platform collisions with scroll offset
         for (const platform of platforms) {
             const playerBottom = y + 25;
             const platformTop = platform.y;
+            const platformX = platform.x + levelScroll;
             
-            if (velocityY >= 0 && // Moving downward or stationary
+            if (velocityY >= 0 && 
                 playerBottom >= platformTop && 
                 playerBottom <= platformTop + 10 && 
-                x + 25 > platform.x && 
-                x - 25 < platform.x + platform.width) {
+                x + 25 > platformX && 
+                x - 25 < platformX + platform.width) {
+
+                // Calculate relative position on platform at collision
+                const relativeX = x - platformX;
+                
                 return {
                     newY: platform.y - 25,
                     newVelocityY: 0,

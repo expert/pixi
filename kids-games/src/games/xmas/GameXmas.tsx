@@ -85,9 +85,10 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             prev,
             platforms,
             { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
-            deltaTime
+            deltaTime,
+            levelScroll
         ));
-    }, [platforms]);
+    }, [platforms, levelScroll]);
 
     useGameLoop(updateGame);
 

@@ -14,16 +14,15 @@ export interface Player {
     currentPlatform: Platform | null;
 }
 
-export const createPlayer = (): Player => ({
-  x: 400,
-  y: GROUND_Y - 25,
-  velocityX: 0,
-  velocityY: 0,
-  isJumping: false,
-  jumpStartTime: null,
-  currentJumpDirection: 'NONE',
-  
-  currentPlatform: null
+export const createPlayer = (width: number): Player => ({
+    x: width / 2,
+    y: GROUND_Y - 25,
+    velocityX: 0,
+    velocityY: 0,
+    isJumping: false,
+    jumpStartTime: null,
+    currentJumpDirection: 'NONE',
+    currentPlatform: null
 });
 
 export const handleFlyPlayer = (player: Player, newSwipeState: SwipeState): Player => {
@@ -43,7 +42,7 @@ export const handleFlyPlayer = (player: Player, newSwipeState: SwipeState): Play
     };
 };
 
-export const updateFlyPlayer = (player: Player, deltaTime: number): Player => {
+export const updateFlyPlayer = (player: Player, deltaTime: number, width: number): Player => {
     const _player = {
         ...player,
         x: player.x + player.velocityX * deltaTime,
@@ -54,7 +53,7 @@ export const updateFlyPlayer = (player: Player, deltaTime: number): Player => {
 
     const boundedPlayer = {
         ..._player,
-        x: Math.max(25, Math.min(_player.x, 775)),
+        x: Math.max(25, Math.min(_player.x, width - 25)),
         y: Math.max(25, Math.min(_player.y, GROUND_Y - 25))
     }
     return boundedPlayer;

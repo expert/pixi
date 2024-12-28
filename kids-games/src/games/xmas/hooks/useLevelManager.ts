@@ -47,7 +47,7 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void)
             : [];
 
         const houses = level === 'LEVEL_4' 
-            ? [HouseSystem.generateHouse(800)] 
+            ? [HouseSystem.generateHouse(width)] 
             : [];
 
         return {

@@ -16,12 +16,14 @@ import { useLevel1State } from './hooks/useLevel1State';
 import { useLevel2State } from './hooks/useLevel2State';
 import { useLevel3State } from './hooks/useLevel3State';
 import { useLevel4State } from './hooks/useLevel4State';
+import { useResponsiveSize } from '../../hooks/useResponsiveSize';
 
 interface GameXmasProps {   
     onBack: () => void;
 }
 
 const GameXmas = ({ onBack }: GameXmasProps) => {
+    const size = useResponsiveSize({ maxWidth: 800, maxHeight: 1100 });
     const [level1State, updateLevel1, handleLevel1Jump, initializeLevel1] = useLevel1State({
         snowballs: [],
         score: 0,
@@ -52,7 +54,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         handleNextLevel
     } = useLevelManager(initializeLevel1);
 
-    const [player, setPlayer] = useState<PlayerState>(createPlayer());
+    const [player, setPlayer] = useState<PlayerState>(createPlayer(size.width));
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
     const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
@@ -118,14 +120,15 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             
             case 'LEVEL_3':
             case 'LEVEL_4':
-                setPlayer(handleFlyPlayer(player, newSwipeState));
+                setPlayer(handleFlyPlayer(player, newSwipeState, size.width));
                 break;
         }
     }, [
         currentLevel, 
         player, 
         handleLevel2Shot, 
-        handleLevel1Jump
+        handleLevel1Jump,
+        size.width
     ]);
 
     const updateGame = useCallback((deltaTime: number) => {
@@ -215,18 +218,22 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     if (!currentLevel || !levelConfig) {
         return (
-            <GameEngine onBack={onBack}>
+            <GameEngine onBack={onBack} width={size.width} height={size.height}>
                 <LevelSelector 
                     onSelectLevel={onLevelSelect}
                     onBack={onBack}
+                    width={size.width}
+                    height={size.height}
                 />
             </GameEngine>
         );
     }
 
     return (
-        <GameEngine onBack={onBack} onSwipe={handleSwipe}>
+        <GameEngine onBack={onBack} onSwipe={handleSwipe} width={size.width} height={size.height}>
             <GameScene 
+                width={size.width}
+                height={size.height}
                 platforms={platforms} 
                 player={player}
                 swipeState={swipeState}

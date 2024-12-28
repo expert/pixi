@@ -5,9 +5,11 @@ import '@pixi/events';
 interface LevelSelectorProps {
     onSelectLevel: (level: string) => void;
     onBack: () => void;
+    width: number;
+    height: number;
 }
 
-export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => {
+export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSelectorProps) => {
     const handleLevelClick = useCallback((level: string) => {
         console.log('Level selected:', level);
         onSelectLevel(level);
@@ -17,8 +19,8 @@ export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => 
         <Container>
             <Text 
                 text="Select Level"
-                x={400}
-                y={100}
+                x={width / 2}
+                y={150}
                 anchor={0.5}
                 style={{
                     fill: 0xFFFFFF,
@@ -29,8 +31,8 @@ export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => 
             {['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'].map((level, index) => (
                 <Container 
                     key={level}
-                    x={200}
-                    y={200 + index * 50}
+                    x={width / 2 - 200}
+                    y={200 + index * 70}
                     eventMode="static" 
                     cursor="pointer"
                     onpointerdown={() => handleLevelClick(level)}
@@ -58,7 +60,7 @@ export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => 
 
             <Container 
                 y={500}
-                x={350}
+                x={width / 2 - 50}
                 eventMode="static" 
                 cursor="pointer"
                 onpointerdown={onBack}
@@ -73,6 +75,7 @@ export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => 
                 />
                 <Text 
                     text="Back"
+                  
                     x={50}
                     y={20}
                     anchor={0.5}

@@ -2,23 +2,23 @@ import { Gift, House } from '../../xmas/types';
 import { GROUND_Y } from '../../xmas/constants';
 
 export class HouseSystem {
-    static generateHouse(startX: number = 800): House {
+    static generateHouse(startX: number): House {
         return {
             x: startX,
-            y: GROUND_Y - 80, // House height is 80px
+            y: GROUND_Y - 80,
             width: 100,
             height: 80,
             hasReceivedGift: false
         };
     }
 
-    static generateHouses(count: number, startX: number = 800): House[] {
+    static generateHouses(count: number, width: number): House[] {
         const houses: House[] = [];
-        let currentX = startX;
+        let currentX = width;
 
         for (let i = 0; i < count; i++) {
             houses.push(this.generateHouse(currentX));
-            currentX += Math.random() * 300 + 400; // Random spacing between houses
+            currentX += Math.random() * 300 + 400;
         }
 
         return houses;

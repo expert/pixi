@@ -4,7 +4,7 @@ import { GROUND_Y } from '../../xmas/constants';
 export class PlatformGenerator {
     static generateLevel(config: PlatformConfig): Platform[] {
         const platforms: Platform[] = [];
-        let currentX = config.startX || 800; // Use provided startX or default
+        let currentX = config.startX || config.width;  // Use screen width if no startX
         
         while (currentX < config.levelWidth) {
             const width = Math.random() * 

@@ -9,8 +9,8 @@ import {
 } from './controllers/SwipeController';
 
 const GameWrapper = styled.div`
-    width: 800px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
     position: relative;
     touch-action: none;
 `;
@@ -19,9 +19,11 @@ interface GameEngineProps {
     children: React.ReactNode;
     onBack: () => void;
     onSwipe?: (state: SwipeState) => void;
+    width: number;
+    height: number;
 }
 
-const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
+const GameEngine = ({ children, onBack, onSwipe, width, height }: GameEngineProps) => {
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
 
     const handleStart = useCallback((x: number, y: number, rect: DOMRect) => {
@@ -110,9 +112,13 @@ const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
             onMouseLeave={handleEnd}
         >
             <Stage
-                width={800}
-                height={600}
-                options={{ backgroundColor: 0x1099bb }}
+                width={width}
+                height={height}
+                options={{ 
+                    backgroundColor: 0x1099bb,
+                    // resolution: 1,
+                    // autoDensity: true
+                }}
             >
                 <Container>{children}</Container>
             </Stage>

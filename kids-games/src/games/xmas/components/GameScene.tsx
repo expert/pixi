@@ -18,9 +18,11 @@ interface GameSceneProps {
     snowmen: any[];
     gifts: any[];
     houses?: House[];
+    width: number;
+    height: number;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts, houses }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts, houses, width, height }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -29,7 +31,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                     g.clear();
                     g.lineStyle(2, 0x00ff00);
                     g.moveTo(0, GROUND_Y + 25);
-                    g.lineTo(800, GROUND_Y + 25);
+                    g.lineTo(width, GROUND_Y + 25);
                 }}
             />
 
@@ -91,7 +93,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
             <Container>
                 <Text 
                     text={`Score: ${score}/${goalScore}`}
-                    x={700}
+                    x={width - 100}
                     y={10}
                     style={{
                         fill: 0xFFFFFF,
@@ -100,7 +102,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 />
                 <Text 
                     text={`Time: ${Math.floor(timeElapsed)}s`}
-                    x={700}
+                    x={width - 100}
                     y={40}
                     style={{
                         fill: 0xFFFFFF,

@@ -1,11 +1,11 @@
 import { AppSize, Gift, House } from '../../xmas/types';
-import { GROUND_Y } from '../../xmas/constants';
+import { calculateAvailableHeight } from '../utils/heightCalculator';
 
 export class HouseSystem {
     static generateHouse(startX: number, size: AppSize): House {
         return {
             x: startX,
-            y: GROUND_Y - 80,
+            y: calculateAvailableHeight(size, 80),
             width: 100,
             height: 80,
             hasReceivedGift: false

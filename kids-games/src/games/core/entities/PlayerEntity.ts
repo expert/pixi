@@ -1,4 +1,4 @@
-import { GROUND_Y } from "../../xmas/constants";
+import { PLAYER_HEIGHT } from "../../xmas/constants";
 import { SwipeDirection, SwipeState } from "../controllers/SwipeController";
 import { AppSize, Platform } from "../../xmas/types";
 import { PhysicsSystem } from "../systems/PhysicsSystem";
@@ -54,7 +54,7 @@ export const updateFlyPlayer = (player: Player, deltaTime: number, size: AppSize
     const boundedPlayer = {
         ..._player,
         x: Math.max(25, Math.min(_player.x, size.width - 25)),
-        y: Math.max(25, Math.min(_player.y, GROUND_Y - 25))
+        y: Math.max(25, Math.min(_player.y, size.height - PLAYER_HEIGHT - 25))
     }
     return boundedPlayer;
 }

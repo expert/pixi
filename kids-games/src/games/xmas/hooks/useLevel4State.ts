@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PlayerState, Gift, House, AppSize } from '../types';
 import { HouseSystem } from '../../core/systems/HouseSystem';
 import { updateFlyPlayer } from '../../core/entities/PlayerEntity';
-import { GROUND_Y } from '../constants';
+import { calculateAvailableHeight } from '../../core/utils/heightCalculator';
 
 export const useLevel4State = (initialState: {
     gifts: Gift[];
@@ -49,7 +49,7 @@ export const useLevel4State = (initialState: {
                     return { ...gift, collected: true };
                 }
 
-                if (newY > GROUND_Y) {
+                if (newY > calculateAvailableHeight(size)) {
                     return { ...gift, collected: true };
                 }
 

@@ -1,11 +1,11 @@
-import { Gift, PlatformConfig } from '../../xmas/types';
-import { GROUND_Y } from '../../xmas/constants';
+import { Gift, PlatformConfig, AppSize } from '../../xmas/types';
+import { calculateAvailableHeight } from '../utils/heightCalculator';
 
 export class GiftSystem {
-    static generateGift(): Gift {
+    static generateGift(size: AppSize): Gift {
         return {
             x: Math.random() * 600 + 100,
-            y: Math.random() * (GROUND_Y - 100) + 50,
+            y: Math.random() * calculateAvailableHeight(size, 100) + 50,
             collected: false,
             createdAt: performance.now()
         };
@@ -16,7 +16,7 @@ export class GiftSystem {
     }
 
     static shouldGenerateNewGift(): boolean {
-        return Math.random() < 0.03; // 3% chance each frame
+        return Math.random() < 0.03;
     }
 
     static checkCollisions(playerX: number, playerY: number, gifts: Gift[]): {
@@ -37,7 +37,7 @@ export class GiftSystem {
                 Math.pow(playerY - gift.y, 2)
             );
 
-            if (distance < 40) { // Collection radius
+            if (distance < 40) {
                 collectedGifts.push({ ...gift, collected: true });
             } else {
                 remainingGifts.push(gift);

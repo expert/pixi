@@ -1,7 +1,8 @@
 import { PlatformConfig, LevelConfig } from "./types";
 
 export const PLAYER_SPEED = 200;
-export const GROUND_Y = 500;
+export const PLAYER_HEIGHT = 50;
+export const PLAYER_RADIUS = 25;
 
 export const INITIAL_JUMP_VELOCITY = -500; // Increased from -400 for higher jumps
 export const MAX_JUMP_DURATION = 300;      // Reduced from 400 for more responsive control

@@ -1,10 +1,11 @@
 import { Platform, PlatformConfig, AppSize } from "../../xmas/types";
-import { GROUND_Y } from "../../xmas/constants";
+import { PLAYER_HEIGHT } from "../../xmas/constants";
 
 export const createPlatform = (
     x: number,
     y: number,
     width: number,
+    size: AppSize,
     config?: {
         isMoving?: boolean;
         startX?: number;
@@ -14,7 +15,7 @@ export const createPlatform = (
     }
 ): Platform => ({
     x,
-    y,
+    y: Math.min(y, size.height - PLAYER_HEIGHT - 50),
     width,
     ...config
 });
@@ -29,16 +30,16 @@ export const generatePlatforms = (config: PlatformConfig, size: AppSize): Platfo
             config.platformSpecs.minWidth;
 
         const y = Math.random() * 
-            (size.height - config.platformSpecs.minHeight) + 
-            // (config.platformSpecs.maxHeight - config.platformSpecs.minHeight) + 
+            (size.height - config.platformSpecs.minHeight - PLAYER_HEIGHT) + 
             config.platformSpecs.minHeight;
 
         const isMoving = Math.random() > 0.7;
         
         const platform = createPlatform(
             currentX,
-            Math.min(y, GROUND_Y - 50),
+            y,
             width,
+            size,
             isMoving ? {
                 isMoving: true,
                 startX: currentX,

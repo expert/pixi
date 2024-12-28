@@ -22,7 +22,7 @@ export const useLevel3State = (initialState: {
             let newGifts = updatedGifts;
             
             if (updatedGifts.length < 5 && GiftSystem.shouldGenerateNewGift()) {
-                newGifts = [...updatedGifts, GiftSystem.generateGift()];
+                newGifts = [...updatedGifts, GiftSystem.generateGift(prevState.size)];
             }
 
             // Check collisions
@@ -35,7 +35,8 @@ export const useLevel3State = (initialState: {
                 gifts: remainingGifts,
                 score: newScore,
                 goalScore: prevState.goalScore,
-                isLevelComplete: newScore >= prevState.goalScore
+                isLevelComplete: newScore >= prevState.goalScore,
+                size: prevState.size
             };
         });
     };

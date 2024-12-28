@@ -96,4 +96,11 @@ export interface House {
     width: number;
     height: number;
     hasReceivedGift: boolean;
+}
+
+export interface Snowball {
+    x: number;
+    y: number;
+    size: number;
+    collected: boolean;
 } 

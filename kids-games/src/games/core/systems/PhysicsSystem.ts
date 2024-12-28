@@ -1,5 +1,5 @@
 import { PlayerState, Platform, AppSize } from '../../xmas/types';
-import { GRAVITY, GROUND_Y, INITIAL_JUMP_VELOCITY, MAX_JUMP_DURATION } from '../../xmas/constants';
+import { GRAVITY, INITIAL_JUMP_VELOCITY, PLAYER_HEIGHT } from '../../xmas/constants';
 import { InputState } from './ControllerSystem';
 import { SwipeDirection } from '../controllers/SwipeController';
 import { JUMP_CONFIGS } from '../../xmas/constants';
@@ -207,10 +207,10 @@ export class PhysicsSystem {
         deltaTime: number,
         size: AppSize
     ): PlayerState {
-        if (!player.isJumping && player.y >= GROUND_Y - 25) {
+        if (!player.isJumping && player.y >= size.height - PLAYER_HEIGHT - 25   ) {
             return {
                 ...player,
-                y: GROUND_Y - 25,
+                y: size.height - PLAYER_HEIGHT - 25,
                 velocityY: 0,
                 velocityX: 0
             };

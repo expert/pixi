@@ -1,5 +1,5 @@
 import { Snowball, PlatformConfig, PlayerState, AppSize } from '../../xmas/types';
-import { GROUND_Y } from '../../xmas/constants';
+import { PLAYER_HEIGHT } from '../../xmas/constants';
 
 export class SnowballSystem {
     static generateSnowballs(config: PlatformConfig, size: AppSize): Snowball[] {
@@ -10,18 +10,18 @@ export class SnowballSystem {
             // Random spacing between snowballs
             const spacing = Math.random() * 300 + 200; // 200-500px spacing
             
-            const size = Math.random() * 
+            const snowballSize = Math.random() * 
                 (config.snowballs.maxSize - config.snowballs.minSize) + 
                 config.snowballs.minSize;
             
-            // Calculate y position from ground up
-            const height = Math.random() * 
-                (GROUND_Y - 100) + 100; // Keep some margin from top
+            const maxHeight = size.height - PLAYER_HEIGHT - snowballSize;
+            const minHeight = maxHeight * 0.2; // Keep some margin from top (20% of available height)
+            const height = Math.random() * (maxHeight - minHeight) + minHeight;
             
             snowballs.push({
                 x: currentX,
-                y: GROUND_Y - height,
-                size,
+                y: height,
+                size: snowballSize,
                 collected: false
             });
             
@@ -50,7 +50,9 @@ export class SnowballSystem {
                 Math.pow(player.y - snowball.y, 2)
             );
 
-            if (distance < (25 + snowball.size / 2)) {
+            // Use snowball size for more accurate collision
+            const collisionRadius = PLAYER_HEIGHT/2 + snowball.size/2;
+            if (distance < collisionRadius) {
                 collectedSnowballs.push({ ...snowball, collected: true });
             } else {
                 remainingSnowballs.push(snowball);

@@ -49,21 +49,18 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const [snowmen, setSnowmen] = useState<Snowman[]>([]);
     const [gifts, setGifts] = useState<Gift[]>([]);
     const [houses, setHouses] = useState<House[]>([]);
-
-    const handleLevelSelect = useCallback((level: string) => {
-        setCurrentLevel(level);
-        setLevelConfig(DEFAULT_LEVEL_CONFIGS[level]);
+    const resetLevel = (level: string) => {
+        setLevelScroll(0);
+        setPlatforms([]);
+        setSnowballs([]);
+        setGifts([]);
         setGameState({
             score: 0,
             timeElapsed: 0,
             isLevelComplete: false,
             goalScore: DEFAULT_LEVEL_CONFIGS[level].goalScore
         });
-        setLevelScroll(0);
-        setPlatforms([]);
-        setSnowballs([]);
-        setGifts([]);
-        setHouses(level === 'LEVEL_4' ? HouseSystem.generateHouses(5) : []);
+
         setPlayer({
             x: 400,
             y: GROUND_Y - 25,
@@ -74,6 +71,19 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             currentJumpDirection: 'NONE',
             currentPlatform: null
         });
+    }
+    const handleLevelSelect = useCallback((level: string) => {
+        setCurrentLevel(level);
+        const _levelConfig = DEFAULT_LEVEL_CONFIGS[level];
+        setLevelConfig(_levelConfig);
+
+        resetLevel(level);
+        if(!_levelConfig) return;
+
+        setPlatforms(['LEVEL_1', 'LEVEL_2'].includes(level) ? PlatformGenerator.generateLevel(_levelConfig) : []);
+        setSnowballs(['LEVEL_1'].includes(level) ? SnowballSystem.generateSnowballs(_levelConfig) : []);
+        setSnowmen(['LEVEL_2'].includes(level) ? [SnowmanSystem.generateSnowman()] : []);
+        setHouses(level === 'LEVEL_4' ? [HouseSystem.generateHouse(800)] : []);
     }, []);
 
     const handleNextLevel = useCallback(() => {
@@ -84,80 +94,36 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         }
     }, [currentLevel, handleLevelSelect]);
 
-    useEffect(() => {
-        if (levelConfig) {
-            if (currentLevel === 'LEVEL_3' || currentLevel === 'LEVEL_4') {
-                // These levels don't need platforms
-                setPlatforms([]);
-            } else {
-                // Generate platforms for Level 1 and 2
-                setPlatforms(PlatformGenerator.generateLevel(levelConfig));
-            }
-
-            if (currentLevel === 'LEVEL_2') {
-                setSnowmen([SnowmanSystem.generateSnowman()]);
-                setSnowballs([]); // Clear snowballs for Level 2
-            } else if (currentLevel === 'LEVEL_1') {
-                setSnowballs(SnowballSystem.generateSnowballs(levelConfig));
-                setSnowmen([]); // Clear snowmen for Level 1
-            }
-        }
-    }, [levelConfig, currentLevel]);
-
     const checkAndRegenerateContent = useCallback(() => {
-        // if (currentLevel === 'LEVEL_2') {
-        //     const lastPlatform = platforms[platforms.length - 1];
+        const lastPlatform = platforms[platforms.length - 1];
+        
+        if (!gameState.isLevelComplete && 
+            lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
             
-        //     if (!gameState.isLevelComplete && 
-        //         lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
-                
-        //         const visiblePlatforms = platforms.filter(p => 
-        //             p.x + p.width + levelScroll > -500
-        //         );
+            const visiblePlatforms = platforms.filter(p => 
+                p.x + p.width + levelScroll > -500
+            );
 
-        //         const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
-        //         const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
-        //             platformConfig.platformSpecs.minGap;
+            const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+            const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+                platformConfig.platformSpecs.minGap;
 
-        //         const newPlatforms = PlatformGenerator.generateLevel({
-        //             ...platformConfig,
-        //             levelWidth: newStartX + 2000,
-        //             startX: newStartX
-        //         });
+            const newPlatforms = PlatformGenerator.generateLevel({
+                ...platformConfig,
+                levelWidth: newStartX + 2000,
+                startX: newStartX
+            });
 
-        //         setPlatforms(visiblePlatforms.concat(newPlatforms));
-        //     }
-        // } else {
-            const lastPlatform = platforms[platforms.length - 1];
-            
-            if (!gameState.isLevelComplete && 
-                lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
-                
-                const visiblePlatforms = platforms.filter(p => 
-                    p.x + p.width + levelScroll > -500
+            const newSnowmen = SnowmanSystem.generateSnowman();
+
+            setPlatforms(visiblePlatforms.concat(newPlatforms));
+            setSnowmen(prev => {
+                const visibleSnowmen = prev.filter(s => 
+                    !s.hit && s.x + levelScroll > -500
                 );
-
-                const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
-                const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
-                    platformConfig.platformSpecs.minGap;
-
-                const newPlatforms = PlatformGenerator.generateLevel({
-                    ...platformConfig,
-                    levelWidth: newStartX + 2000,
-                    startX: newStartX
-                });
-
-                const newSnowmen = SnowmanSystem.generateSnowman();
-
-                setPlatforms(visiblePlatforms.concat(newPlatforms));
-                setSnowmen(prev => {
-                    const visibleSnowmen = prev.filter(s => 
-                        !s.hit && s.x + levelScroll > -500
-                    );
-                    return visibleSnowmen.concat(newSnowmen);
-                });
-            }
-        // }
+                return visibleSnowmen.concat(newSnowmen);
+            });
+        }
     }, [platforms, snowballs, levelScroll, gameState.isLevelComplete, platformConfig, currentLevel]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {

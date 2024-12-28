@@ -73,4 +73,11 @@ export interface Snowman {
     hit: boolean;
     createdAt: number;
     duration: number;
+}
+
+export interface Gift {
+    x: number;
+    y: number;
+    collected: boolean;
+    createdAt: number;
 } 

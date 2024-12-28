@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from '@pixi/react';
-import { Platform, PlayerState, SwipeState, Snowball } from '../types';
+import { Platform, PlayerState, SwipeState, Snowball, Gift } from '../types';
 import { GROUND_Y } from '../constants';
 
 interface GameSceneProps {
@@ -16,9 +16,10 @@ interface GameSceneProps {
     currentLevel: string;
     projectiles: any[];
     snowmen: any[];
+    gifts: Gift[];
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -179,6 +180,28 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                         }}
                     />
                 </>
+            )}
+
+            {currentLevel === 'LEVEL_3' && (
+                <Graphics
+                    draw={g => {
+                        g.clear();
+                        g.beginFill(0xFF0000); // Red color for gifts
+                        gifts.forEach(gift => {
+                            if (!gift.collected) {
+                                // Draw a simple gift box
+                                g.drawRect(gift.x - 15, gift.y - 15, 30, 30);
+                                // Draw ribbon
+                                g.lineStyle(3, 0xFFFF00);
+                                g.moveTo(gift.x - 15, gift.y);
+                                g.lineTo(gift.x + 15, gift.y);
+                                g.moveTo(gift.x, gift.y - 15);
+                                g.lineTo(gift.x, gift.y + 15);
+                            }
+                        });
+                        g.endFill();
+                    }}
+                />
             )}
         </Container>
     );

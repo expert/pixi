@@ -83,10 +83,10 @@ export class PhysicsSystem {
         newState.x = Math.max(25, Math.min(size.width - 25, newState.x));
 
         // Check ground collision
-        if (newState.y >= GROUND_Y - 25) {
+        if (newState.y >= size.height - 25) {
             newState = {
                 ...newState,
-                y: GROUND_Y - 25,
+                y: size.height - 25,
                 velocityY: 0,
                 velocityX: 0,
                 isJumping: false,
@@ -102,7 +102,8 @@ export class PhysicsSystem {
             newState.y,
             newState.velocityY,
             platforms,
-            levelScroll
+            levelScroll,
+            size
         );
 
         // Apply collision results
@@ -125,7 +126,8 @@ export class PhysicsSystem {
         y: number,
         velocityY: number,
         platforms: Platform[],
-        levelScroll: number
+        levelScroll: number,
+        size: AppSize
     ): { 
         newY: number;
         newVelocityY: number;
@@ -134,9 +136,9 @@ export class PhysicsSystem {
         currentPlatform: Platform | null;
     } {
         // First check ground collision
-        if (y >= GROUND_Y - 25) {
+        if (y >= size.height - 25) {
             return {
-                newY: GROUND_Y - 25,
+                newY: size.height - 25,
                 newVelocityY: 0,
                 isJumping: false,
                 platformSpeed: 0,

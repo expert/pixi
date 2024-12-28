@@ -4,7 +4,7 @@ import { useGameLoop } from '../../hooks/useGameLoop';
 import { PlayerState, Platform, PlatformConfig, GameState, Projectile, Snowman, Gift, House, AppSize } from './types';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
-import { INITIAL_PLATFORMS, DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
+import { DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
 import { SwipeState, createSwipeState } from '../core/controllers/SwipeController';
 import { JumpIndicator } from './components/JumpIndicator';
 import { LevelSelector } from './components/LevelSelector';

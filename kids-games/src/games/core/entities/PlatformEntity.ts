@@ -1,4 +1,62 @@
-import { Platform } from "../../xmas/types";
+import { Platform, PlatformConfig } from "../../xmas/types";
+import { GROUND_Y } from "../../xmas/constants";
+
+export const createPlatform = (
+    x: number,
+    y: number,
+    width: number,
+    config?: {
+        isMoving?: boolean;
+        startX?: number;
+        endX?: number;
+        speed?: number;
+        direction?: 1 | -1;
+    }
+): Platform => ({
+    x,
+    y,
+    width,
+    ...config
+});
+
+export const generatePlatforms = (config: PlatformConfig): Platform[] => {
+    const platforms: Platform[] = [];
+    let currentX = config.startX || 0;
+
+    for (let i = 0; i < config.count; i++) {
+        const width = Math.random() * 
+            (config.platformSpecs.maxWidth - config.platformSpecs.minWidth) + 
+            config.platformSpecs.minWidth;
+
+        const y = Math.random() * 
+            (config.platformSpecs.maxHeight - config.platformSpecs.minHeight) + 
+            config.platformSpecs.minHeight;
+
+        const isMoving = Math.random() > 0.7;
+        
+        const platform = createPlatform(
+            currentX,
+            Math.min(y, GROUND_Y - 50),
+            width,
+            isMoving ? {
+                isMoving: true,
+                startX: currentX,
+                endX: currentX + 200,
+                speed: 100,
+                direction: 1
+            } : undefined
+        );
+
+        platforms.push(platform);
+        
+        currentX += width + 
+            Math.random() * 
+            (config.platformSpecs.maxGap - config.platformSpecs.minGap) + 
+            config.platformSpecs.minGap;
+    }
+
+    return platforms;
+};
 
 export const updatePlatform = (
     platform: Platform, 
@@ -34,4 +92,31 @@ export const updatePlatforms = (
             x: updatedPlatform.x + scrollSpeed * deltaTime
         };
     });
+};
+
+export const regeneratePlatforms = (
+    platforms: Platform[],
+    levelScroll: number,
+    config: PlatformConfig
+): Platform[] => {
+    const visiblePlatforms = platforms.filter(p => 
+        p.x + p.width + levelScroll > -500
+    );
+
+    const lastPlatform = platforms[platforms.length - 1];
+    if (lastPlatform.x + lastPlatform.width + levelScroll >= 1500) {
+        return visiblePlatforms;
+    }
+
+    const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+    const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+        config.platformSpecs.minGap;
+
+    const newPlatforms = generatePlatforms({
+        ...config,
+        levelWidth: newStartX + 2000,
+        startX: newStartX
+    });
+
+    return visiblePlatforms.concat(newPlatforms);
 }; 

@@ -73,6 +73,7 @@ export interface Snowman {
     hit: boolean;
     createdAt: number;
     duration: number;
+    velocityX: number;
 }
 
 export interface Gift {

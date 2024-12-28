@@ -8,6 +8,7 @@ export interface PlayerState {
     isJumping: boolean;
     jumpStartTime: number | null;
     currentJumpDirection: SwipeDirection;
+    currentPlatform: Platform | null;
 }
 
 export interface Platform {

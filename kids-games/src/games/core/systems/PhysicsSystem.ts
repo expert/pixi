@@ -27,6 +27,31 @@ export class PhysicsSystem {
         let newState = { ...player };
         const jumpConfig = JUMP_CONFIGS[player.currentJumpDirection];
 
+        // If player is on a platform, stick to it unless jumping
+        if (player.currentPlatform && !player.isJumping) {
+            // Find the current platform state by position range (since platform x changes)
+            const updatedPlatform = platforms.find(p => 
+                p.y === player.currentPlatform!.y && // Same height
+                Math.abs(p.x - player.currentPlatform!.x) < 5 && // Similar x position
+                p.width === player.currentPlatform!.width // Same platform
+            );
+            
+            if (updatedPlatform && updatedPlatform.isMoving) {
+                // Update player position with current platform movement
+                newState = {
+                    ...newState,
+                    x: newState.x + updatedPlatform.speed! * updatedPlatform.direction! * deltaTime,
+                    y: updatedPlatform.y - 25,
+                    velocityY: 0,
+                    velocityX: 0,
+                    currentPlatform: updatedPlatform
+                };
+                return newState;
+            }
+            // If on static platform, just stay put
+            return newState;
+        }
+
         // Apply gravity
         newState.velocityY += GRAVITY * deltaTime;
 
@@ -50,8 +75,10 @@ export class PhysicsSystem {
                 velocityY: 0,
                 velocityX: 0,
                 isJumping: false,
-                currentJumpDirection: 'NONE'
+                currentJumpDirection: 'NONE',
+                currentPlatform: null
             };
+            return newState;
         }
 
         // Check platform collisions
@@ -68,15 +95,11 @@ export class PhysicsSystem {
             y: collision.newY,
             velocityY: collision.newVelocityY,
             isJumping: collision.isJumping,
+            currentPlatform: collision.currentPlatform,
             // Only reset jump state if we've landed
             jumpStartTime: collision.isJumping ? newState.jumpStartTime : null,
             currentJumpDirection: collision.isJumping ? newState.currentJumpDirection : 'NONE'
         };
-
-        // Apply platform movement if landed on a moving platform
-        if (!collision.isJumping && collision.platformSpeed !== null) {
-            newState.x += collision.platformSpeed * deltaTime;
-        }
 
         return newState;
     }
@@ -91,6 +114,7 @@ export class PhysicsSystem {
         newVelocityY: number;
         isJumping: boolean;
         platformSpeed: number | null;
+        currentPlatform: Platform | null;
     } {
         // First check ground collision
         if (y >= GROUND_Y - 25) {
@@ -98,7 +122,8 @@ export class PhysicsSystem {
                 newY: GROUND_Y - 25,
                 newVelocityY: 0,
                 isJumping: false,
-                platformSpeed: 0
+                platformSpeed: 0,
+                currentPlatform: null
             };
         }
 
@@ -107,7 +132,7 @@ export class PhysicsSystem {
             const playerBottom = y + 25;
             const platformTop = platform.y;
             
-            if (velocityY > 0 && 
+            if (velocityY >= 0 && // Moving downward or stationary
                 playerBottom >= platformTop && 
                 playerBottom <= platformTop + 10 && 
                 x + 25 > platform.x && 
@@ -116,7 +141,8 @@ export class PhysicsSystem {
                     newY: platform.y - 25,
                     newVelocityY: 0,
                     isJumping: false,
-                    platformSpeed: platform.isMoving ? platform.speed! * platform.direction! : 0
+                    platformSpeed: platform.isMoving ? platform.speed! * platform.direction! : 0,
+                    currentPlatform: platform
                 };
             }
         }
@@ -125,7 +151,8 @@ export class PhysicsSystem {
             newY: y, 
             newVelocityY: velocityY, 
             isJumping: true, 
-            platformSpeed: null 
+            platformSpeed: null,
+            currentPlatform: null
         };
     }
 
@@ -145,7 +172,8 @@ export class PhysicsSystem {
             velocityY: jumpConfig.verticalVelocity * normalizedMagnitude,
             isJumping: true,
             jumpStartTime: performance.now(),
-            currentJumpDirection: direction
+            currentJumpDirection: direction,
+            currentPlatform: null
         };
     }
 

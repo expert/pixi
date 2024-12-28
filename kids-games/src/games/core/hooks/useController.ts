@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ControllerSystem, InputState, InputAction } from '../systems/ControllerSystem';
+import { PhysicsSystem } from '../systems/PhysicsSystem';
 
 export const useController = () => {
     const [inputState, setInputState] = useState<InputState>(
@@ -18,8 +19,11 @@ export const useController = () => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const action = keyMap.get(e.code);
-            if (action) {
-                e.preventDefault();
+            console.log(e.code, action);
+                if (action) {
+                    if (action === 'JUMP') {
+                        // PhysicsSystem.startJump(player);
+                    }
                 handleInput(action, true);
             }
         };
@@ -30,7 +34,9 @@ export const useController = () => {
                 e.preventDefault();
                 handleInput(action, false);
                 if (action === 'JUMP') {
+                    // This ensures a smoother jump release
                     handleInput('JUMP_RELEASE', true);
+                    setTimeout(() => handleInput('JUMP_RELEASE', false), 50);
                 }
             }
         };

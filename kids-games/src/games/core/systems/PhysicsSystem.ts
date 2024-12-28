@@ -4,12 +4,13 @@ import { InputState } from './ControllerSystem';
 
 export class PhysicsSystem {
     static startJump(player: PlayerState): PlayerState {
+        console.log('startJump', player);
         if (!player.isJumping) {
             return {
                 ...player,
                 velocityY: INITIAL_JUMP_VELOCITY,
                 isJumping: true,
-                jumpStartTime: Date.now()
+                jumpStartTime: performance.now()
             };
         }
         return player;
@@ -27,12 +28,16 @@ export class PhysicsSystem {
         // Apply gravity
         newVelocityY += GRAVITY * deltaTime;
 
-        // Variable jump height
+        // Variable jump height - hold jump for higher jumps
         if (isJumping && inputState.jumpPressed && 
             player.jumpStartTime && 
-            Date.now() - player.jumpStartTime < MAX_JUMP_DURATION && 
-            player.velocityY < 0) {
+            performance.now() - player.jumpStartTime < MAX_JUMP_DURATION) {
             newVelocityY = INITIAL_JUMP_VELOCITY;
+        }
+        // console.log(`isJumping: ${isJumping} - jumpPressed: ${inputState.jumpPressed} - jumpStartTime: ${player.jumpStartTime} - jumpDuration: ${Date.now() - player.jumpStartTime < MAX_JUMP_DURATION}`);
+        // Cut jump short when button is released
+        if (!inputState.jumpPressed && newVelocityY < 0) {
+            newVelocityY *= 0.5;
         }
 
         // Update position
@@ -45,12 +50,20 @@ export class PhysicsSystem {
             isJumping = false;
         }
 
+        // Check platform collisions
+        const collision = PhysicsSystem.checkPlatformCollision(
+            player.x,
+            newY,
+            newVelocityY,
+            platforms
+        );
+
         return {
             ...player,
-            y: newY,
-            velocityY: newVelocityY,
-            isJumping,
-            jumpStartTime: isJumping ? player.jumpStartTime : null
+            y: collision.newY,
+            velocityY: collision.newVelocityY,
+            isJumping: collision.isJumping,
+            jumpStartTime: collision.isJumping ? player.jumpStartTime : null
         };
     }
 

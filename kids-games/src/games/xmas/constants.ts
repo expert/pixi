@@ -1,9 +1,9 @@
 export const PLAYER_SPEED = 200;
-export const INITIAL_JUMP_VELOCITY = -400;
-export const MAX_JUMP_DURATION = 400;
-export const GRAVITY = 900;
 export const GROUND_Y = 500;
 
+export const INITIAL_JUMP_VELOCITY = -500; // Increased from -400 for higher jumps
+export const MAX_JUMP_DURATION = 300;      // Reduced from 400 for more responsive control
+export const GRAVITY = 1200;               // Increased from 900 for snappier falls
 export const INITIAL_PLATFORMS = [
     { x: 200, y: 400, width: 100 },
     { 
@@ -23,3 +23,4 @@ export const INITIAL_PLATFORMS = [
         direction: -1
     },
 ]; 
+   

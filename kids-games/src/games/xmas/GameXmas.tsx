@@ -30,12 +30,16 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         setPlayer(prev => {
             // Calculate horizontal movement
             let newX = prev.x + inputState.horizontal * PLAYER_SPEED * deltaTime;
-
+            // console.log('inputState', inputState, inputState.jumpPressed && !prev.isJumping);
+            if (inputState.jumpPressed && !prev.isJumping) {
+                console.log('startJump');
+                PhysicsSystem.startJump(prev);
+            }
             // Start jump if needed
             let newState = inputState.jumpPressed && !prev.isJumping
                 ? PhysicsSystem.startJump(prev)
                 : prev;
-
+ 
             // Apply physics
             newState = PhysicsSystem.updatePlayerPhysics(
                 newState, 

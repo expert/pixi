@@ -39,8 +39,8 @@ export const useLevel3State = (initialState: {
         });
     };
 
-    const updatePlayer = (player: PlayerState, deltaTime: number) => {
-        return updateFlyPlayer(player, deltaTime);
+    const updatePlayer = (player: PlayerState, deltaTime: number, width: number) => {
+        return updateFlyPlayer(player, deltaTime, width);
     };
 
     return [state, updateLevel3, updatePlayer] as const;

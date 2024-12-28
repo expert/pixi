@@ -23,7 +23,8 @@ export class PhysicsSystem {
         platforms: Platform[],
         inputState: InputState,
         deltaTime: number,
-        levelScroll: number
+        levelScroll: number,
+        width: number
     ): PlayerState {
         let newState = { ...player };
         const jumpConfig = JUMP_CONFIGS[player.currentJumpDirection];
@@ -79,7 +80,7 @@ export class PhysicsSystem {
         newState.y += newState.velocityY * deltaTime;
 
         // Keep player within screen bounds
-        newState.x = Math.max(25, Math.min(775, newState.x));
+        newState.x = Math.max(25, Math.min(width - 25, newState.x));
 
         // Check ground collision
         if (newState.y >= GROUND_Y - 25) {
@@ -180,7 +181,8 @@ export class PhysicsSystem {
     static startDirectionalJump(
         player: PlayerState,
         direction: SwipeDirection,
-        magnitude: number
+        magnitude: number,
+        width: number
     ): PlayerState {
         if (player.isJumping) return player;
         

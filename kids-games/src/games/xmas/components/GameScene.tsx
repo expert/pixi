@@ -1,4 +1,4 @@
-import { Container } from '@pixi/react';
+import { Container, Graphics } from '@pixi/react';
 import { Platform, PlayerState, SwipeState, Snowball, House } from '../types';
 import { Level1Scene } from './levels/Level1Scene';
 import { Level2Scene } from './levels/Level2Scene';
@@ -42,6 +42,20 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 width={width}
                 height={height}
             />
+
+            {/* Swipe indicator */}
+            {swipeState.isActive && swipeState.startPoint && (
+                <Graphics
+                    draw={g => {
+                        g.clear();
+                        g.lineStyle(2, 0xFFFFFF, 0.5);
+                        g.moveTo(swipeState.startPoint.x, swipeState.startPoint.y);
+                        if (swipeState.endPoint) {
+                            g.lineTo(swipeState.endPoint.x, swipeState.endPoint.y);
+                        }
+                    }}
+                />
+            )}
 
             {/* Level-specific scenes */}
             {currentLevel === 'LEVEL_1' && (

@@ -52,7 +52,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         levelConfig,
         handleLevelSelect,
         handleNextLevel
-    } = useLevelManager(initializeLevel1);
+    } = useLevelManager(initializeLevel1, size.width);
 
     const [player, setPlayer] = useState<PlayerState>(createPlayer(size.width));
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
@@ -97,7 +97,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                     regeneratePlatforms(prev, levelScroll, platformConfig)
                 );
                 setSnowmen(prev => prev.filter(s => 
-                    !s.hit && s.x + levelScroll > -500
+                    !s.hit && s.x + levelScroll > -size.width
                 ));
                 break;
         }
@@ -144,7 +144,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 platforms,
                 { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
                 deltaTime,
-                levelScroll
+                levelScroll,
+                size.width
             ));
         };
 
@@ -173,7 +174,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break; 
 
             case 'LEVEL_3':
-                setPlayer(updateLevel3Player(player, deltaTime));
+                setPlayer(updateLevel3Player(player, deltaTime, size.width));
                 updateLevel3(deltaTime, player);
                 setGifts(level3State.gifts);
                 setGameState(prev => ({
@@ -184,7 +185,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break;
 
             case 'LEVEL_4':
-                setPlayer(updateLevel4Player(player, deltaTime));
+                setPlayer(updateLevel4Player(player, deltaTime, size.width));
                 updateLevel4(deltaTime, player);
                 setHouses(level4State.houses);
                 setGifts(level4State.gifts);
@@ -261,11 +262,4 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 };
 
 export default GameXmas;
-
-function handleLevel2Shot(player: PlayerState, newSwipeState: SwipeState) {
-    throw new Error('Function not implemented.');
-}
-function updateLevel3Player(player: PlayerState, deltaTime: number): import("react").SetStateAction<PlayerState> {
-    throw new Error('Function not implemented.');
-}
 

@@ -6,7 +6,7 @@ import { SnowmanSystem } from '../../core/systems/SnowmanSystem';
 import { HouseSystem } from '../../core/systems/HouseSystem';
 import { createPlayer } from '../../core/entities/PlayerEntity';
 
-export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void) => {
+export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void, width: number) => {
     const [currentLevel, setCurrentLevel] = useState<string | null>(null);
     const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
 
@@ -16,7 +16,7 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void)
             platforms: [],
             snowballs: [],
             gifts: [],
-            player: createPlayer(),
+            player: createPlayer(width),
             gameState: {
                 score: 0,
                 timeElapsed: 0,

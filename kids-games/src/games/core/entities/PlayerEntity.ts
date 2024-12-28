@@ -25,13 +25,13 @@ export const createPlayer = (width: number): Player => ({
     currentPlatform: null
 });
 
-export const handleFlyPlayer = (player: Player, newSwipeState: SwipeState): Player => {
+export const handleFlyPlayer = (player: Player, newSwipeState: SwipeState, width: number): Player => {
     if (!newSwipeState.isActive || !newSwipeState.endPoint) {  
         return player;
     }
     const dx = newSwipeState.endPoint.x - newSwipeState.startPoint!.x;
     const dy = newSwipeState.endPoint.y - newSwipeState.startPoint!.y;
-    const magnitude = Math.min(newSwipeState.magnitude * 2, 800);
+    const magnitude = Math.min(newSwipeState.magnitude * 2, width - 50);
     const angle = Math.atan2(dy, dx);
     
     return {
@@ -59,7 +59,7 @@ export const updateFlyPlayer = (player: Player, deltaTime: number, width: number
     return boundedPlayer;
 }
 
-export const handleJumpPlayer = (player: Player, newSwipeState: SwipeState): Player => {
+export const handleJumpPlayer = (player: Player, newSwipeState: SwipeState, width: number): Player => {
     if (newSwipeState.isActive && 
         newSwipeState.direction !== 'NONE' && 
         newSwipeState.endPoint && 
@@ -69,7 +69,8 @@ export const handleJumpPlayer = (player: Player, newSwipeState: SwipeState): Pla
         return PhysicsSystem.startDirectionalJump(
             player,
             newSwipeState.direction,
-            newSwipeState.magnitude
+            newSwipeState.magnitude,
+            width
         );
     }
     return player;

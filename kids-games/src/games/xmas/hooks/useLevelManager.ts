@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
-import { LevelConfig } from '../types';
+import { AppSize, LevelConfig } from '../types';
 import { DEFAULT_LEVEL_CONFIGS } from '../constants';
 import { generatePlatforms } from '../../core/entities/PlatformEntity';
 import { SnowmanSystem } from '../../core/systems/SnowmanSystem';
 import { HouseSystem } from '../../core/systems/HouseSystem';
 import { createPlayer } from '../../core/entities/PlayerEntity';
 
-export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void, width: number) => {
+export const useLevelManager = (initializeLevel1: (config: LevelConfig, size: AppSize) => void, size: AppSize) => {
     const [currentLevel, setCurrentLevel] = useState<string | null>(null);
     const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
 
@@ -16,7 +16,7 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void,
             platforms: [],
             snowballs: [],
             gifts: [],
-            player: createPlayer(width),
+            player: createPlayer(size),
             gameState: {
                 score: 0,
                 timeElapsed: 0,
@@ -35,11 +35,11 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void,
         if(!_levelConfig) return initialState;
 
         const platforms = ['LEVEL_1', 'LEVEL_2'].includes(level) 
-            ? generatePlatforms(_levelConfig) 
+            ? generatePlatforms(_levelConfig, size) 
             : [];
         
         if (level === 'LEVEL_1') {
-            initializeLevel1(_levelConfig);
+            initializeLevel1(_levelConfig, size);
         }
         
         const snowmen = ['LEVEL_2'].includes(level) 
@@ -47,7 +47,7 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig) => void,
             : [];
 
         const houses = level === 'LEVEL_4' 
-            ? [HouseSystem.generateHouse(width)] 
+            ? [HouseSystem.generateHouse(size.width, size)] 
             : [];
 
         return {

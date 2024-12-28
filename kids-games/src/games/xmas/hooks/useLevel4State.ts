@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlayerState, Gift, House } from '../types';
+import { PlayerState, Gift, House, AppSize } from '../types';
 import { HouseSystem } from '../../core/systems/HouseSystem';
 import { updateFlyPlayer } from '../../core/entities/PlayerEntity';
 import { GROUND_Y } from '../constants';
@@ -10,13 +10,14 @@ export const useLevel4State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
+    size: AppSize;
 }) => {
     const [state, setState] = useState({
         ...initialState,
         isLevelComplete: false
     });
 
-    const updateLevel4 = (deltaTime: number, player: PlayerState) => {
+    const updateLevel4 = (deltaTime: number, player: PlayerState, size: AppSize) => {
         setState(prevState => {
             // Update houses
             let updatedHouses = HouseSystem.updateHouses(
@@ -27,7 +28,7 @@ export const useLevel4State = (initialState: {
 
             // Generate new houses if needed
             if (updatedHouses.length < 3) {
-                updatedHouses = [...updatedHouses, HouseSystem.generateHouse(800)];
+                updatedHouses = [...updatedHouses, HouseSystem.generateHouse(0, size)];
             }
 
             // Update gifts
@@ -84,8 +85,8 @@ export const useLevel4State = (initialState: {
         });
     };
 
-    const updatePlayer = (player: PlayerState, deltaTime: number, width: number) => {
-        return updateFlyPlayer(player, deltaTime, width);
+    const updatePlayer = (player: PlayerState, deltaTime: number, size: AppSize) => {
+        return updateFlyPlayer(player, deltaTime, size);
     };
 
     return [state, updateLevel4, updatePlayer] as const;

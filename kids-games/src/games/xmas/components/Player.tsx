@@ -6,6 +6,7 @@ interface PlayerProps {
 }
 
 export const Player = ({ player }: PlayerProps) => {
+    console.log('player', player);
     return (
         <Graphics
             draw={g => {

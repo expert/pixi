@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { GiftSystem } from '../../core/systems/GiftSystem';
-import { PlayerState, Gift } from '../types';
+import { PlayerState, Gift, AppSize } from '../types';
 import { updateFlyPlayer } from '../../core/entities/PlayerEntity';
 
 export const useLevel3State = (initialState: {
@@ -8,6 +8,7 @@ export const useLevel3State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
+    size: AppSize;
 }) => {
     const [state, setState] = useState({
         ...initialState,
@@ -39,8 +40,8 @@ export const useLevel3State = (initialState: {
         });
     };
 
-    const updatePlayer = (player: PlayerState, deltaTime: number, width: number) => {
-        return updateFlyPlayer(player, deltaTime, width);
+    const updatePlayer = (player: PlayerState, deltaTime: number, size: AppSize) => {
+        return updateFlyPlayer(player, deltaTime, size);
     };
 
     return [state, updateLevel3, updatePlayer] as const;

@@ -1,10 +1,10 @@
-import { Snowball, PlatformConfig, PlayerState } from '../../xmas/types';
+import { Snowball, PlatformConfig, PlayerState, AppSize } from '../../xmas/types';
 import { GROUND_Y } from '../../xmas/constants';
 
 export class SnowballSystem {
-    static generateSnowballs(config: PlatformConfig): Snowball[] {
+    static generateSnowballs(config: PlatformConfig, size: AppSize): Snowball[] {
         const snowballs: Snowball[] = [];
-        let currentX = config.startX || 800; // Use provided startX or default
+        let currentX = config.startX || size.width; // Use provided startX or default
         
         while (currentX < config.levelWidth) {
             // Random spacing between snowballs

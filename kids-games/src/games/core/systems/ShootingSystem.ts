@@ -1,11 +1,11 @@
-import { PlayerState, Projectile, Platform, Snowman } from '../../xmas/types';
+import { PlayerState, Projectile, Platform, Snowman, AppSize } from '../../xmas/types';
 import { SwipeState } from '../controllers/SwipeController';
 
 export class ShootingSystem {
-    static startShot(player: PlayerState, swipeState: SwipeState): Projectile | null {
+    static startShot(player: PlayerState, swipeState: SwipeState, size: AppSize): Projectile | null {
         if (!swipeState.startPoint || !swipeState.endPoint) return null;
 
-        const baseSpeed = Math.min(swipeState.magnitude * 2, 800);
+        const baseSpeed = Math.min(swipeState.magnitude * 2, size.width - 50);
         
         const dx = swipeState.startPoint.x - swipeState.endPoint.x;
         const dy = swipeState.startPoint.y - swipeState.endPoint.y;

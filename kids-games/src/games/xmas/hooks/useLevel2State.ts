@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ShootingSystem } from '../../core/systems/ShootingSystem';
 import { SnowmanSystem } from '../../core/systems/SnowmanSystem';
-import { PlayerState, Projectile, Snowman, Platform  } from '../types';
+import { PlayerState, Projectile, Snowman, Platform, AppSize  } from '../types';
 import { SwipeState } from '../../core/controllers/SwipeController';
 
 export const useLevel2State = (initialState: {
@@ -10,15 +10,16 @@ export const useLevel2State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
+    size: AppSize;
 }) => {
     const [state, setState] = useState({
         ...initialState,
         isLevelComplete: false
     });
 
-    const handleShot = (player: PlayerState, swipeState: SwipeState) => {
+    const handleShot = (player: PlayerState, swipeState: SwipeState, size: AppSize) => {
         if (swipeState.isActive && swipeState.endPoint) {
-            const newProjectile = ShootingSystem.startShot(player, swipeState);
+            const newProjectile = ShootingSystem.startShot(player, swipeState, size);
             if (newProjectile) {
                 setState(prev => ({
                     ...prev,

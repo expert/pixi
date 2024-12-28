@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SnowballSystem } from '../../core/systems/SnowballSystem';
-import { PlayerState, Platform, LevelConfig } from '../types';
+import { PlayerState, Platform, LevelConfig, AppSize } from '../types';
 import { SwipeState } from '../../core/controllers/SwipeController';
 import { handleJumpPlayer } from '../../core/entities/PlayerEntity'
 export const useLevel1State = (initialState: {
@@ -8,20 +8,22 @@ export const useLevel1State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
-}) => {
+    size: AppSize;
+}) => { 
     const [state, setState] = useState({
         ...initialState,
         isLevelComplete: false
     });
 
-    const handleJump = (player: PlayerState, swipeState: SwipeState) => {
-        return handleJumpPlayer(player, swipeState);
+    const handleJump = (player: PlayerState, swipeState: SwipeState, size: AppSize) => {
+        return handleJumpPlayer(player, swipeState, size);
     };
 
     const updateLevel1 = (
         deltaTime: number, 
         player: PlayerState,
-        levelScroll: number
+        levelScroll: number,
+        size: AppSize
     ) => {
         setState(prevState => {
             const { collectedSnowballs, remainingSnowballs } = 
@@ -38,10 +40,10 @@ export const useLevel1State = (initialState: {
         });
     };
 
-    const initializeLevel = (levelConfig: LevelConfig) => {
+    const initializeLevel = (levelConfig: LevelConfig, size: AppSize) => {
         setState(prev => ({
             ...prev,
-            snowballs: SnowballSystem.generateSnowballs(levelConfig)
+            snowballs: SnowballSystem.generateSnowballs(levelConfig, size)
         }));
     };
 

@@ -1,4 +1,4 @@
-import { PlayerState, Platform } from '../../xmas/types';
+import { PlayerState, Platform, AppSize } from '../../xmas/types';
 import { GRAVITY, GROUND_Y, INITIAL_JUMP_VELOCITY, MAX_JUMP_DURATION } from '../../xmas/constants';
 import { InputState } from './ControllerSystem';
 import { SwipeDirection } from '../controllers/SwipeController';
@@ -24,7 +24,7 @@ export class PhysicsSystem {
         inputState: InputState,
         deltaTime: number,
         levelScroll: number,
-        width: number
+        size: AppSize
     ): PlayerState {
         let newState = { ...player };
         const jumpConfig = JUMP_CONFIGS[player.currentJumpDirection];
@@ -80,7 +80,7 @@ export class PhysicsSystem {
         newState.y += newState.velocityY * deltaTime;
 
         // Keep player within screen bounds
-        newState.x = Math.max(25, Math.min(width - 25, newState.x));
+        newState.x = Math.max(25, Math.min(size.width - 25, newState.x));
 
         // Check ground collision
         if (newState.y >= GROUND_Y - 25) {
@@ -182,7 +182,7 @@ export class PhysicsSystem {
         player: PlayerState,
         direction: SwipeDirection,
         magnitude: number,
-        width: number
+        size: AppSize
     ): PlayerState {
         if (player.isJumping) return player;
         
@@ -202,7 +202,8 @@ export class PhysicsSystem {
 
     static updateJumpPhysics(
         player: PlayerState,
-        deltaTime: number
+        deltaTime: number,
+        size: AppSize
     ): PlayerState {
         if (!player.isJumping && player.y >= GROUND_Y - 25) {
             return {

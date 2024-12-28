@@ -1,4 +1,4 @@
-import { Platform, PlatformConfig } from "../../xmas/types";
+import { Platform, PlatformConfig, AppSize } from "../../xmas/types";
 import { GROUND_Y } from "../../xmas/constants";
 
 export const createPlatform = (
@@ -19,7 +19,7 @@ export const createPlatform = (
     ...config
 });
 
-export const generatePlatforms = (config: PlatformConfig): Platform[] => {
+export const generatePlatforms = (config: PlatformConfig, size: AppSize): Platform[] => {
     const platforms: Platform[] = [];
     let currentX = config.startX || 0;
 
@@ -29,7 +29,8 @@ export const generatePlatforms = (config: PlatformConfig): Platform[] => {
             config.platformSpecs.minWidth;
 
         const y = Math.random() * 
-            (config.platformSpecs.maxHeight - config.platformSpecs.minHeight) + 
+            (size.height - config.platformSpecs.minHeight) + 
+            // (config.platformSpecs.maxHeight - config.platformSpecs.minHeight) + 
             config.platformSpecs.minHeight;
 
         const isMoving = Math.random() > 0.7;
@@ -95,16 +96,17 @@ export const updatePlatforms = (
 };
 
 export const regeneratePlatforms = (
-    platforms: Platform[],
+    platforms: Platform[] = [],
     levelScroll: number,
-    config: PlatformConfig
+    config: PlatformConfig,
+    size: AppSize
 ): Platform[] => {
     const visiblePlatforms = platforms.filter(p => 
-        p.x + p.width + levelScroll > -500
+        p.x + p.width + levelScroll > -size.width
     );
 
     const lastPlatform = platforms[platforms.length - 1];
-    if (lastPlatform.x + lastPlatform.width + levelScroll >= 1500) {
+    if (lastPlatform.x + lastPlatform.width + levelScroll >= size.width * 2) {
         return visiblePlatforms;
     }
 
@@ -116,7 +118,7 @@ export const regeneratePlatforms = (
         ...config,
         levelWidth: newStartX + 2000,
         startX: newStartX
-    });
+    }, size);
 
     return visiblePlatforms.concat(newPlatforms);
 }; 

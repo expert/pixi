@@ -1,5 +1,10 @@
 import { SwipeDirection } from "../core/controllers/SwipeController";
 
+export interface AppSize {
+    width: number;
+    height: number;
+}
+
 export interface PlayerState {
     x: number;
     y: number;

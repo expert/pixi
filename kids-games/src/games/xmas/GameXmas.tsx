@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { PlayerState, Platform, PlatformConfig, Snowball, GameState, Projectile, Snowman, Gift, House } from './types';
+import { PlayerState, Platform, PlatformConfig, GameState, Projectile, Snowman, Gift, House, AppSize } from './types';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
 import { INITIAL_PLATFORMS, DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
@@ -27,24 +27,28 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const [level1State, updateLevel1, handleLevel1Jump, initializeLevel1] = useLevel1State({
         snowballs: [],
         score: 0,
-        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore,
+        size
     });
     const [level3State, updateLevel3, updateLevel3Player] = useLevel3State({
         gifts: [],
         score: 0,
-        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_3.goalScore
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_3.goalScore,
+        size
     });
     const [level4State, updateLevel4, updateLevel4Player] = useLevel4State({
         gifts: [],
         houses: [],
         score: 0,
-        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_4.goalScore
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_4.goalScore,
+        size
     });
     const [level2State, updateLevel2, handleLevel2Shot] = useLevel2State({
         projectiles: [],
         snowmen: [],
         score: 0,
-        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_2.goalScore
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_2.goalScore,
+        size
     });
 
     const {
@@ -52,10 +56,10 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         levelConfig,
         handleLevelSelect,
         handleNextLevel
-    } = useLevelManager(initializeLevel1, size.width);
+    } = useLevelManager(initializeLevel1, size);
 
-    const [player, setPlayer] = useState<PlayerState>(createPlayer(size.width));
-    const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
+    const [player, setPlayer] = useState<PlayerState>(createPlayer(size ));
+    const [platforms, setPlatforms] = useState<Platform[]>();
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
     const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
     const [levelScroll, setLevelScroll] = useState(0);
@@ -88,13 +92,13 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         switch (currentLevel) {
             case 'LEVEL_1':
                 setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, platformConfig)
+                    regeneratePlatforms(prev, levelScroll, platformConfig, size)
                 );
                 break;
             
             case 'LEVEL_2':
                 setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, platformConfig)
+                    regeneratePlatforms(prev, levelScroll, platformConfig, size)
                 );
                 setSnowmen(prev => prev.filter(s => 
                     !s.hit && s.x + levelScroll > -size.width
@@ -104,23 +108,24 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     }, [
         currentLevel, 
         levelScroll, 
-        platformConfig
+        platformConfig,
+        size
     ]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         switch (currentLevel) {
             case 'LEVEL_1':
                 setSwipeState(newSwipeState);
-                setPlayer(handleLevel1Jump(player, newSwipeState));
+                setPlayer(handleLevel1Jump(player, newSwipeState, size));
                 break;
             
             case 'LEVEL_2':
-                handleLevel2Shot(player, newSwipeState);
+                handleLevel2Shot(player, newSwipeState, size);
                 break;
             
             case 'LEVEL_3':
             case 'LEVEL_4':
-                setPlayer(handleFlyPlayer(player, newSwipeState, size.width));
+                setPlayer(handleFlyPlayer(player, newSwipeState, size));
                 break;
         }
     }, [
@@ -128,7 +133,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         player, 
         handleLevel2Shot, 
         handleLevel1Jump,
-        size.width
+        size
     ]);
 
     const updateGame = useCallback((deltaTime: number) => {
@@ -145,13 +150,13 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
                 deltaTime,
                 levelScroll,
-                size.width
+                size
             ));
         };
 
         switch (currentLevel) {
             case 'LEVEL_1':
-                updateLevel1(deltaTime, player, levelScroll);
+                updateLevel1(deltaTime, player, levelScroll, size);
                 setSnowballs(level1State.snowballs);
                 setGameState(prev => ({
                     ...prev,
@@ -162,7 +167,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break;
 
             case 'LEVEL_2':
-                updateLevel2(deltaTime, platforms, levelScroll);
+                updateLevel2(deltaTime, platforms, levelScroll, size);
                 setProjectiles(level2State.projectiles);
                 setSnowmen(level2State.snowmen);
                 setGameState(prev => ({
@@ -174,7 +179,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break; 
 
             case 'LEVEL_3':
-                setPlayer(updateLevel3Player(player, deltaTime, size.width));
+                setPlayer(updateLevel3Player(player, deltaTime, size));
                 updateLevel3(deltaTime, player);
                 setGifts(level3State.gifts);
                 setGameState(prev => ({
@@ -185,7 +190,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break;
 
             case 'LEVEL_4':
-                setPlayer(updateLevel4Player(player, deltaTime, size.width));
+                setPlayer(updateLevel4Player(player, deltaTime, size));
                 updateLevel4(deltaTime, player);
                 setHouses(level4State.houses);
                 setGifts(level4State.gifts);

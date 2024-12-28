@@ -1,8 +1,8 @@
-import { Gift, House } from '../../xmas/types';
+import { AppSize, Gift, House } from '../../xmas/types';
 import { GROUND_Y } from '../../xmas/constants';
 
 export class HouseSystem {
-    static generateHouse(startX: number): House {
+    static generateHouse(startX: number, size: AppSize): House {
         return {
             x: startX,
             y: GROUND_Y - 80,
@@ -12,12 +12,12 @@ export class HouseSystem {
         };
     }
 
-    static generateHouses(count: number, width: number): House[] {
+    static generateHouses(count: number, size: AppSize): House[] {
         const houses: House[] = [];
-        let currentX = width;
+        let currentX = size.width;
 
         for (let i = 0; i < count; i++) {
-            houses.push(this.generateHouse(currentX));
+            houses.push(this.generateHouse(currentX, size));
             currentX += Math.random() * 300 + 400;
         }
 

@@ -115,7 +115,7 @@ export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
             minGap: 150,
             maxGap: 300,
             minHeight: 10,
-            maxHeight: 300
+            // maxHeight: 300
         },
         snowballs: {
             frequency: 0.3,

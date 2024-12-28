@@ -15,7 +15,8 @@ import { ShootingSystem } from '../core/systems/ShootingSystem';
 import { SnowmanSystem } from '../core/systems/SnowmanSystem';
 import { GiftSystem } from '../core/systems/GiftSystem';
 import { HouseSystem } from '../core/systems/HouseSystem';
-import { handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entites/PlayerEntity';
+import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entites/PlayerEntity';
+import { updatePlatforms } from '../core/entities/PlatformEntity';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -25,15 +26,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const [currentLevel, setCurrentLevel] = useState<string | null>(null);
     const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
 
-    const [player, setPlayer] = useState<PlayerState>({
-        x: 400,
-        y: GROUND_Y - 25,
-        velocityX: 0,
-        velocityY: 0,
-        isJumping: false,
-        jumpStartTime: null,
-        currentJumpDirection: 'NONE'
-    });
+    const [player, setPlayer] = useState<PlayerState>(createPlayer());
 
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
@@ -62,16 +55,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             goalScore: DEFAULT_LEVEL_CONFIGS[level].goalScore
         });
 
-        setPlayer({
-            x: 400,
-            y: GROUND_Y - 25,
-            velocityX: 0,
-            velocityY: 0,
-            isJumping: false,
-            jumpStartTime: null,
-            currentJumpDirection: 'NONE',
-            currentPlatform: null
-        });
+        setPlayer(createPlayer());
     }
     const handleLevelSelect = useCallback((level: string) => {
         setCurrentLevel(level);
@@ -147,19 +131,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         if (gameState.isLevelComplete) return;
 
         if (currentLevel === 'LEVEL_4') {
-            setPlayer(prev => ({
-                ...prev,
-                x: prev.x + prev.velocityX * deltaTime,
-                y: prev.y + prev.velocityY * deltaTime,
-                velocityX: prev.velocityX * 0.98,
-                velocityY: prev.velocityY * 0.98
-            }));
-
-            setPlayer(prev => ({
-                ...prev,
-                x: Math.max(25, Math.min(prev.x, 775)),
-                y: Math.max(25, Math.min(prev.y, GROUND_Y - 200))
-            }));
+            setPlayer(updateFlyPlayer(player, deltaTime));
 
             setHouses(prev => 
                 HouseSystem.updateHouses(prev, -100 * deltaTime, deltaTime)
@@ -213,7 +185,6 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             }
         } else if (currentLevel === 'LEVEL_3') {
             setPlayer(updateFlyPlayer(player, deltaTime));
-
 
             setGifts(prev => {
                 const updatedGifts = GiftSystem.updateGifts(prev);
@@ -274,27 +245,9 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
         if (currentLevel === 'LEVEL_1' || currentLevel === 'LEVEL_2') {
             checkAndRegenerateContent();
-
-            setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
             
-            setPlatforms(prev => prev.map(platform => {
-                if (!platform.isMoving) return platform;
-
-                const newX = platform.x + platform.speed! * platform.direction! * deltaTime;
-                
-                if (newX <= platform.startX! || newX >= platform.endX!) {
-                    return {
-                        ...platform,
-                        x: newX <= platform.startX! ? platform.startX! : platform.endX!,
-                        direction: platform.direction! * -1 as 1 | -1
-                    };
-                }
-
-                return {
-                    ...platform,
-                    x: newX
-                };
-            }));
+            setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
+            setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig.scrollSpeed));
 
             setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
                 prev,

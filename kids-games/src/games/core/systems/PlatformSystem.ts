@@ -1,4 +1,4 @@
-import { Platform } from '../types';
+import { Platform } from '../../xmas/types';
 
 export class PlatformSystem {
     static updatePlatforms(platforms: Platform[], deltaTime: number): Platform[] {

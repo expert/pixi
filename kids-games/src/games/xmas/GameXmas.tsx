@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
 import { PlayerState, Platform } from './types';
-import { usePlayerControls } from './hooks/usePlayerControls';
-import { PlatformSystem } from './systems/PlatformSystem';
-import { PhysicsSystem } from './systems/PhysicsSystem';
+import { useController } from '../core/hooks/useController';
+import { PlatformSystem } from '../core/systems/PlatformSystem';
+import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
 import { INITIAL_PLATFORMS, PLAYER_SPEED } from './constants';
 
@@ -22,22 +22,27 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     });
 
     const [platforms, setPlatforms] = useState<Platform[]>(INITIAL_PLATFORMS);
-    const [keys, setKeys] = useState<Set<string>>(new Set());
-
-    usePlayerControls(player, setPlayer, setKeys);
+    const inputState = useController();
 
     const updateGame = useCallback((deltaTime: number) => {
         setPlatforms(prev => PlatformSystem.updatePlatforms(prev, deltaTime));
 
         setPlayer(prev => {
             // Calculate horizontal movement
-            let newX = prev.x + (
-                (keys.has('ArrowRight') ? 1 : 0) - 
-                (keys.has('ArrowLeft') ? 1 : 0)
-            ) * PLAYER_SPEED * deltaTime;
+            let newX = prev.x + inputState.horizontal * PLAYER_SPEED * deltaTime;
 
-            // Apply physics and get new state
-            let newState = PhysicsSystem.updatePlayerPhysics(prev, platforms, keys, deltaTime);
+            // Start jump if needed
+            let newState = inputState.jumpPressed && !prev.isJumping
+                ? PhysicsSystem.startJump(prev)
+                : prev;
+
+            // Apply physics
+            newState = PhysicsSystem.updatePlayerPhysics(
+                newState, 
+                platforms,
+                inputState,
+                deltaTime
+            );
 
             // Check platform collisions
             const collision = PhysicsSystem.checkPlatformCollision(
@@ -55,7 +60,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 isJumping: collision.isJumping
             };
 
-            // Apply platform movement to player if standing on platform
+            // Apply platform movement
             if (!collision.isJumping && collision.platformSpeed !== null) {
                 newX += collision.platformSpeed * deltaTime;
             }
@@ -68,7 +73,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 x: newX
             };
         });
-    }, [keys, platforms]);
+    }, [inputState, platforms]);
 
     useGameLoop(updateGame);
 

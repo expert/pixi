@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { PlayerState } from '../types';
+import { PlayerState } from '../../xmas/types';
 import { PhysicsSystem } from '../systems/PhysicsSystem';
 
 export const usePlayerControls = (

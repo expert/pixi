@@ -1,5 +1,6 @@
-import { PlayerState, Platform } from '../types';
-import { GRAVITY, GROUND_Y, INITIAL_JUMP_VELOCITY, MAX_JUMP_DURATION } from '../constants';
+import { PlayerState, Platform } from '../../xmas/types';
+import { GRAVITY, GROUND_Y, INITIAL_JUMP_VELOCITY, MAX_JUMP_DURATION } from '../../xmas/constants';
+import { InputState } from './ControllerSystem';
 
 export class PhysicsSystem {
     static startJump(player: PlayerState): PlayerState {
@@ -17,22 +18,21 @@ export class PhysicsSystem {
     static updatePlayerPhysics(
         player: PlayerState,
         platforms: Platform[],
-        keys: Set<string>,
+        inputState: InputState,
         deltaTime: number
     ): PlayerState {
         let newVelocityY = player.velocityY;
         let isJumping = player.isJumping;
-        // console.log(keys, isJumping);
+
         // Apply gravity
         newVelocityY += GRAVITY * deltaTime;
-        console.log(newVelocityY, player.velocityY, isJumping, player.jumpStartTime, Date.now() - player.jumpStartTime, keys.has(' '));
+
         // Variable jump height
-        if (isJumping && keys.has(' ') && 
+        if (isJumping && inputState.jumpPressed && 
             player.jumpStartTime && 
             Date.now() - player.jumpStartTime < MAX_JUMP_DURATION && 
             player.velocityY < 0) {
             newVelocityY = INITIAL_JUMP_VELOCITY;
-              console.log('jump', newVelocityY, player.velocityY);
         }
 
         // Update position

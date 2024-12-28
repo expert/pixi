@@ -15,6 +15,7 @@ import { ShootingSystem } from '../core/systems/ShootingSystem';
 import { SnowmanSystem } from '../core/systems/SnowmanSystem';
 import { GiftSystem } from '../core/systems/GiftSystem';
 import { HouseSystem } from '../core/systems/HouseSystem';
+import { handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entites/PlayerEntity';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -97,50 +98,38 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const checkAndRegenerateContent = useCallback(() => {
         const lastPlatform = platforms[platforms.length - 1];
         
-        if (!gameState.isLevelComplete && 
-            lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
-            
-            const visiblePlatforms = platforms.filter(p => 
-                p.x + p.width + levelScroll > -500
-            );
-
-            const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
-            const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
-                platformConfig.platformSpecs.minGap;
-
-            const newPlatforms = PlatformGenerator.generateLevel({
-                ...platformConfig,
-                levelWidth: newStartX + 2000,
-                startX: newStartX
-            });
-
-            const newSnowmen = SnowmanSystem.generateSnowman();
-
-            setPlatforms(visiblePlatforms.concat(newPlatforms));
-            setSnowmen(prev => {
-                const visibleSnowmen = prev.filter(s => 
-                    !s.hit && s.x + levelScroll > -500
+            if (!gameState.isLevelComplete && 
+                lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
+                
+                const visiblePlatforms = platforms.filter(p => 
+                    p.x + p.width + levelScroll > -500
                 );
-                return visibleSnowmen.concat(newSnowmen);
-            });
-        }
+
+                const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+                const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+                    platformConfig.platformSpecs.minGap;
+
+                const newPlatforms = PlatformGenerator.generateLevel({
+                    ...platformConfig,
+                    levelWidth: newStartX + 2000,
+                    startX: newStartX
+                });
+
+                const newSnowmen = SnowmanSystem.generateSnowman();
+
+                setPlatforms(visiblePlatforms.concat(newPlatforms));
+                setSnowmen(prev => {
+                    const visibleSnowmen = prev.filter(s => 
+                        !s.hit && s.x + levelScroll > -500
+                    );
+                    return visibleSnowmen.concat(newSnowmen);
+                });
+            }
     }, [platforms, snowballs, levelScroll, gameState.isLevelComplete, platformConfig, currentLevel]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         if (currentLevel === 'LEVEL_3' || currentLevel === 'LEVEL_4') {
-            if (newSwipeState.isActive && newSwipeState.endPoint) {
-                const dx = newSwipeState.endPoint.x - newSwipeState.startPoint!.x;
-                const dy = newSwipeState.endPoint.y - newSwipeState.startPoint!.y;
-                const magnitude = Math.min(newSwipeState.magnitude * 2, 800);
-                const angle = Math.atan2(dy, dx);
-                
-                setPlayer(prev => ({
-                    ...prev,
-                    velocityX: magnitude * Math.cos(angle),
-                    velocityY: magnitude * Math.sin(angle),
-                    isJumping: true
-                }));
-            }
+            setPlayer(handleFlyPlayer(player, newSwipeState));
         } else if (currentLevel === 'LEVEL_2') {
             if (newSwipeState.isActive && newSwipeState.endPoint) {
                 const newProjectile = ShootingSystem.startShot(player, newSwipeState);
@@ -150,16 +139,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             }
         } else if (currentLevel === 'LEVEL_1') {
             setSwipeState(newSwipeState);
-            if (newSwipeState.isActive && 
-                newSwipeState.direction !== 'NONE' && 
-                newSwipeState.endPoint && 
-                !player.isJumping) {
-                setPlayer(prev => PhysicsSystem.startDirectionalJump(
-                    prev,
-                    newSwipeState.direction,
-                    newSwipeState.magnitude
-                ));
-            }
+            setPlayer(handleJumpPlayer(player, newSwipeState));
         }
     }, [currentLevel, player]);
 
@@ -232,19 +212,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 setPlayer(prev => ({ ...prev, dropGift: false }));
             }
         } else if (currentLevel === 'LEVEL_3') {
-            setPlayer(prev => ({
-                ...prev,
-                x: prev.x + prev.velocityX * deltaTime,
-                y: prev.y + prev.velocityY * deltaTime,
-                velocityX: prev.velocityX * 0.98,
-                velocityY: prev.velocityY * 0.98
-            }));
+            setPlayer(updateFlyPlayer(player, deltaTime));
 
-            setPlayer(prev => ({
-                ...prev,
-                x: Math.max(25, Math.min(prev.x, 775)),
-                y: Math.max(25, Math.min(prev.y, GROUND_Y - 25))
-            }));
 
             setGifts(prev => {
                 const updatedGifts = GiftSystem.updateGifts(prev);

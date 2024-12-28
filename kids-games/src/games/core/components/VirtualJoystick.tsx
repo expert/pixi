@@ -23,6 +23,7 @@ export const VirtualJoystick = ({ onInput }: VirtualJoystickProps) => {
 
         const distance = Math.sqrt(x * x + y * y);
         const maxDistance = rect.width / 2 - 20;
+        
         if (distance > maxDistance) {
             x = (x / distance) * maxDistance;
             y = (y / distance) * maxDistance;
@@ -30,25 +31,40 @@ export const VirtualJoystick = ({ onInput }: VirtualJoystickProps) => {
 
         setPosition({ x, y });
 
-        const horizontalThreshold = 10;
-        if (x < -horizontalThreshold) {
+        // Calculate normalized direction
+        const normalizedX = x / maxDistance;
+        const normalizedY = y / maxDistance;
+        const threshold = 0.3;
+
+        // Handle horizontal movement
+        if (normalizedX < -threshold) {
             onInput('MOVE_LEFT', true);
             onInput('MOVE_RIGHT', false);
-        } else if (x > horizontalThreshold) {
+        } else if (normalizedX > threshold) {
             onInput('MOVE_LEFT', false);
             onInput('MOVE_RIGHT', true);
         } else {
             onInput('MOVE_LEFT', false);
             onInput('MOVE_RIGHT', false);
         }
+
+        // Handle vertical movement (including jump)
+        if (normalizedY < -threshold) {
+            onInput('JUMP', true);
+        } else {
+            onInput('JUMP', false);
+            onInput('JUMP_RELEASE', true);
+        }
     };
 
     const handleTouchStart = (e: React.TouchEvent) => {
+        e.preventDefault();
         setIsDragging(true);
         handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
+        e.preventDefault();
         handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
     };
 
@@ -57,6 +73,8 @@ export const VirtualJoystick = ({ onInput }: VirtualJoystickProps) => {
         setPosition({ x: 0, y: 0 });
         onInput('MOVE_LEFT', false);
         onInput('MOVE_RIGHT', false);
+        onInput('JUMP', false);
+        onInput('JUMP_RELEASE', true);
     };
 
     return (
@@ -69,15 +87,6 @@ export const VirtualJoystick = ({ onInput }: VirtualJoystickProps) => {
             >
                 <JoystickKnob $x={position.x} $y={position.y} />
             </JoystickContainer>
-            <JumpButton
-                onTouchStart={() => onInput('JUMP', true)}
-                onTouchEnd={() => {
-                    onInput('JUMP', false);
-                    onInput('JUMP_RELEASE', true);
-                }}
-            >
-                ↑
-            </JumpButton>
         </>
     );
 }; 

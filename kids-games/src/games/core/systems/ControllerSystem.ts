@@ -1,9 +1,16 @@
 import { PlayerState } from '../../xmas/types';
 
-export type InputAction = 'MOVE_LEFT' | 'MOVE_RIGHT' | 'JUMP' | 'JUMP_RELEASE';
+export type InputAction = 
+    | 'MOVE_LEFT' 
+    | 'MOVE_RIGHT' 
+    | 'MOVE_UP' 
+    | 'MOVE_DOWN' 
+    | 'JUMP' 
+    | 'JUMP_RELEASE';
 
 export interface InputState {
     horizontal: number;  // -1 (left) to 1 (right)
+    vertical: number;    // -1 (up) to 1 (down)
     isJumping: boolean;
     jumpPressed: boolean;
 }
@@ -11,6 +18,7 @@ export interface InputState {
 export class ControllerSystem {
     private static defaultState: InputState = {
         horizontal: 0,
+        vertical: 0,
         isJumping: false,
         jumpPressed: false
     };
@@ -19,6 +27,8 @@ export class ControllerSystem {
         return new Map([
             ['ArrowLeft', 'MOVE_LEFT'],
             ['ArrowRight', 'MOVE_RIGHT'],
+            ['ArrowUp', 'MOVE_UP'],
+            ['ArrowDown', 'MOVE_DOWN'],
             ['Space', 'JUMP'],
         ]);
     }
@@ -45,7 +55,7 @@ export class ControllerSystem {
                 return {
                     ...currentInput,
                     jumpPressed: pressed,
-                    isJumping: pressed ? true : currentInput.isJumping
+                    isJumping: pressed || currentInput.isJumping
                 };
             case 'JUMP_RELEASE':
                 return {

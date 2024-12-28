@@ -40,4 +40,32 @@ export const JumpButton = styled.div`
     &:active {
         background: rgba(255, 255, 255, 0.4);
     }
+`;
+
+export const DirectionalButton = styled.div`
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    touch-action: none;
+    user-select: none;
+
+    &:active {
+        background: rgba(255, 255, 255, 0.4);
+    }
+`;
+
+export const DirectionalButtonsContainer = styled.div`
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 5px;
 `; 

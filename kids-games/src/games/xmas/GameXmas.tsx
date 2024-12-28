@@ -10,12 +10,16 @@ import { SwipeState, createSwipeState } from '../core/controllers/SwipeControlle
 import { JumpIndicator } from './components/JumpIndicator';
 import { PlatformGenerator } from '../core/systems/PlatformGenerator';
 import { SnowballSystem } from '../core/systems/SnowballSystem';
+import { LevelSelector } from './components/LevelSelector';
 
 interface GameXmasProps {   
     onBack: () => void;
 }
 
 const GameXmas = ({ onBack }: GameXmasProps) => {
+    const [currentLevel, setCurrentLevel] = useState<string | null>(null);
+    const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
+
     const [player, setPlayer] = useState<PlayerState>({
         x: 400,
         y: GROUND_Y - 25,
@@ -38,13 +42,44 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
     });
 
-    useEffect(() => {
-        setPlatforms(PlatformGenerator.generateLevel(platformConfig));
-    }, [platformConfig]);
+    const handleLevelSelect = useCallback((level: string) => {
+        setCurrentLevel(level);
+        setLevelConfig(DEFAULT_LEVEL_CONFIGS[level]);
+        setGameState({
+            score: 0,
+            timeElapsed: 0,
+            isLevelComplete: false,
+            goalScore: DEFAULT_LEVEL_CONFIGS[level].goalScore
+        });
+        setLevelScroll(0);
+        setPlatforms([]);
+        setSnowballs([]);
+        setPlayer({
+            x: 400,
+            y: GROUND_Y - 25,
+            velocityX: 0,
+            velocityY: 0,
+            isJumping: false,
+            jumpStartTime: null,
+            currentJumpDirection: 'NONE',
+            currentPlatform: null
+        });
+    }, []);
+
+    const handleNextLevel = useCallback(() => {
+        const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3'];
+        const currentIndex = levels.indexOf(currentLevel!);
+        if (currentIndex < levels.length - 1) {
+            handleLevelSelect(levels[currentIndex + 1]);
+        }
+    }, [currentLevel, handleLevelSelect]);
 
     useEffect(() => {
-        setSnowballs(SnowballSystem.generateSnowballs(platformConfig));
-    }, [platformConfig]);
+        if (levelConfig) {
+            setPlatforms(PlatformGenerator.generateLevel(levelConfig));
+            setSnowballs(SnowballSystem.generateSnowballs(levelConfig));
+        }
+    }, [levelConfig]);
 
     const checkAndRegenerateContent = useCallback(() => {
         const lastPlatform = platforms[platforms.length - 1];
@@ -154,6 +189,17 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     useGameLoop(updateGame);
 
+    if (!currentLevel || !levelConfig) {
+        return (
+            <GameEngine onBack={onBack}>
+                <LevelSelector 
+                    onSelectLevel={handleLevelSelect}
+                    onBack={onBack}
+                />
+            </GameEngine>
+        );
+    }
+
     return (
         <GameEngine onBack={onBack} onSwipe={handleSwipe}>
             <GameScene 
@@ -166,6 +212,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 timeElapsed={gameState.timeElapsed}
                 goalScore={gameState.goalScore}
                 isLevelComplete={gameState.isLevelComplete}
+                onNextLevel={handleNextLevel}
+                currentLevel={currentLevel}
             />
             <JumpIndicator 
                 isVisible={player.isJumping}

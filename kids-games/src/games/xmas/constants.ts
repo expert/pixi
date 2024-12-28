@@ -105,8 +105,70 @@ export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
 
 export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
     LEVEL_1: {
-        ...DEFAULT_PLATFORM_CONFIGS.LEVEL_1,
+        count: 20,
+        direction: 'horizontal',
+        scrollSpeed: -150,
+        levelWidth: 5000,
+        platformSpecs: {
+            minWidth: 100,
+            maxWidth: 300,
+            minGap: 150,
+            maxGap: 300,
+            minHeight: 10,
+            maxHeight: 300
+        },
+        snowballs: {
+            frequency: 0.3,
+            minSize: 20,
+            maxSize: 30,
+            minHeight: 50,
+            maxHeight: 100
+        },
         goalScore: 10
+    },
+    LEVEL_2: {
+        count: 20,
+        direction: 'horizontal',
+        scrollSpeed: -200, // Faster scroll
+        levelWidth: 6000,
+        platformSpecs: {
+            minWidth: 80,  // Smaller platforms
+            maxWidth: 200,
+            minGap: 200,   // Bigger gaps
+            maxGap: 400,
+            minHeight: 50,
+            maxHeight: 400
+        },
+        snowballs: {
+            frequency: 0.4,
+            minSize: 15,
+            maxSize: 25,
+            minHeight: 100,
+            maxHeight: 200
+        },
+        goalScore: 15
+    },
+    LEVEL_3: {
+        count: 20,
+        direction: 'horizontal',
+        scrollSpeed: -250, // Even faster
+        levelWidth: 7000,
+        platformSpecs: {
+            minWidth: 60,
+            maxWidth: 150,
+            minGap: 250,
+            maxGap: 450,
+            minHeight: 100,
+            maxHeight: 500
+        },
+        snowballs: {
+            frequency: 0.5,
+            minSize: 10,
+            maxSize: 20,
+            minHeight: 150,
+            maxHeight: 300
+        },
+        goalScore: 20
     }
 }; 
    

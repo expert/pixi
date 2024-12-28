@@ -18,20 +18,20 @@ const GameWrapper = styled.div`
 interface GameEngineProps {
     children: React.ReactNode;
     onBack: () => void;
-    onSwipe: (state: SwipeState) => void;
+    onSwipe?: (state: SwipeState) => void;
 }
 
 const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
 
-    const handleTouchStart = useCallback((e: React.TouchEvent) => {
-        const touch = e.touches[0];
-        const rect = e.currentTarget.getBoundingClientRect();
+    const handleStart = useCallback((x: number, y: number, rect: DOMRect) => {
+        if (!onSwipe) return;
+        
         const newState = {
             isActive: true,
             startPoint: { 
-                x: touch.clientX - rect.left, 
-                y: touch.clientY - rect.top 
+                x: x - rect.left, 
+                y: y - rect.top 
             },
             endPoint: null,
             direction: 'NONE',
@@ -41,14 +41,12 @@ const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
         onSwipe(newState);
     }, [onSwipe]);
 
-    const handleTouchMove = useCallback((e: React.TouchEvent) => {
-        if (!swipeState.isActive || !swipeState.startPoint) return;
+    const handleMove = useCallback((x: number, y: number, rect: DOMRect) => {
+        if (!onSwipe || !swipeState.isActive || !swipeState.startPoint) return;
 
-        const touch = e.touches[0];
-        const rect = e.currentTarget.getBoundingClientRect();
         const currentPoint = { 
-            x: touch.clientX - rect.left, 
-            y: touch.clientY - rect.top 
+            x: x - rect.left, 
+            y: y - rect.top 
         };
         
         const direction = calculateSwipeDirection(swipeState.startPoint, currentPoint);
@@ -65,23 +63,51 @@ const GameEngine = ({ children, onBack, onSwipe }: GameEngineProps) => {
         onSwipe(newState);
     }, [swipeState, onSwipe]);
 
-    const handleTouchEnd = useCallback(() => {
+    const handleEnd = useCallback(() => {
+        if (!onSwipe) return;
+        
         if (swipeState.isActive && swipeState.direction !== 'NONE') {
-            // Trigger the jump with final swipe state
             onSwipe(swipeState);
         }
         
-        // Reset swipe state
         const newState = createSwipeState();
         setSwipeState(newState);
         onSwipe(newState);
     }, [swipeState, onSwipe]);
 
+    // Touch events
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        handleStart(touch.clientX, touch.clientY, rect);
+    }, [handleStart]);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        handleMove(touch.clientX, touch.clientY, rect);
+    }, [handleMove]);
+
+    // Mouse events
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        handleStart(e.clientX, e.clientY, rect);
+    }, [handleStart]);
+
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        handleMove(e.clientX, e.clientY, rect);
+    }, [handleMove]);
+
     return (
         <GameWrapper
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            onTouchEnd={handleEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleEnd}
+            onMouseLeave={handleEnd}
         >
             <Stage
                 width={800}

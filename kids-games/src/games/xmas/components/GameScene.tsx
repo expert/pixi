@@ -12,9 +12,11 @@ interface GameSceneProps {
     timeElapsed: number;
     goalScore: number;
     isLevelComplete: boolean;
+    onNextLevel: () => void;
+    currentLevel: string;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -102,16 +104,46 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                     }}
                 />
                 {isLevelComplete && (
-                    <Text 
-                        text="Level Complete!"
-                        x={400}
-                        y={300}
-                        anchor={0.5}
-                        style={{
-                            fill: 0xFFFF00,
-                            fontSize: 40
-                        }}
-                    />
+                    <Container>
+                        <Text 
+                            text="Level Complete!"
+                            x={400}
+                            y={250}
+                            anchor={0.5}
+                            style={{
+                                fill: 0xFFFF00,
+                                fontSize: 40
+                            }}
+                        />
+                        {currentLevel !== 'LEVEL_3' && (
+                            <Container 
+                                x={350}
+                                y={350}
+                                interactive={true}
+                                cursor="pointer"
+                                onclick={onNextLevel}
+                            >
+                                <Graphics
+                                    draw={g => {
+                                        g.clear();
+                                        g.beginFill(0x44FF44, 0.5);
+                                        g.drawRoundedRect(0, 0, 100, 40, 10);
+                                        g.endFill();
+                                    }}
+                                />
+                                <Text 
+                                    text="Next Level"
+                                    x={50}
+                                    y={20}
+                                    anchor={0.5}
+                                    style={{
+                                        fill: 0xFFFFFF,
+                                        fontSize: 20
+                                    }}
+                                />
+                            </Container>
+                        )}
+                    </Container>
                 )}
             </Container>
         </Container>

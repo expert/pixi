@@ -28,7 +28,8 @@ export interface PlatformConfig {
     count: number;
     direction: 'horizontal' | 'vertical';
     scrollSpeed: number;
-    levelWidth: number;  // Total width of the level
+    levelWidth: number;
+    startX?: number;
     platformSpecs: {
         minWidth: number;
         maxWidth: number;
@@ -44,4 +45,15 @@ export interface PlatformConfig {
         minHeight: number;
         maxHeight: number;
     };
+}
+
+export interface GameState {
+    score: number;
+    timeElapsed: number;
+    isLevelComplete: boolean;
+    goalScore: number;
+}
+
+export interface LevelConfig extends PlatformConfig {
+    goalScore: number;
 } 

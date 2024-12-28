@@ -4,7 +4,7 @@ import { GROUND_Y } from '../../xmas/constants';
 export class SnowballSystem {
     static generateSnowballs(config: PlatformConfig): Snowball[] {
         const snowballs: Snowball[] = [];
-        let currentX = 800; // Start after screen width
+        let currentX = config.startX || 800; // Use provided startX or default
         
         while (currentX < config.levelWidth) {
             // Random spacing between snowballs

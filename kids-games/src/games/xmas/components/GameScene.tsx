@@ -9,9 +9,12 @@ interface GameSceneProps {
     levelScroll: number;
     snowballs: Snowball[];
     score: number;
+    timeElapsed: number;
+    goalScore: number;
+    isLevelComplete: boolean;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete }: GameSceneProps) => {
     return (
         <Container>
             {/* Static ground line */}
@@ -78,16 +81,39 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 />
             )}
 
-            {/* Score display */}
-            <Text 
-                text={`Score: ${score}`}
-                x={700}
-                y={10}
-                style={{
-                    fill: 0xFFFFFF,
-                    fontSize: 20
-                }}
-            />
+            {/* Game UI */}
+            <Container>
+                <Text 
+                    text={`Score: ${score}/${goalScore}`}
+                    x={700}
+                    y={10}
+                    style={{
+                        fill: 0xFFFFFF,
+                        fontSize: 20
+                    }}
+                />
+                <Text 
+                    text={`Time: ${Math.floor(timeElapsed)}s`}
+                    x={700}
+                    y={40}
+                    style={{
+                        fill: 0xFFFFFF,
+                        fontSize: 20
+                    }}
+                />
+                {isLevelComplete && (
+                    <Text 
+                        text="Level Complete!"
+                        x={400}
+                        y={300}
+                        anchor={0.5}
+                        style={{
+                            fill: 0xFFFF00,
+                            fontSize: 40
+                        }}
+                    />
+                )}
+            </Container>
         </Container>
     );
 }; 

@@ -1,4 +1,4 @@
-import { PlatformConfig } from "./types";
+import { PlatformConfig, LevelConfig } from "./types";
 
 export const PLAYER_SPEED = 200;
 export const GROUND_Y = 500;
@@ -100,6 +100,13 @@ export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
             minHeight: 50,     // Minimum height above platform
             maxHeight: 100     // Maximum height above platform
         }
+    }
+}; 
+
+export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
+    LEVEL_1: {
+        ...DEFAULT_PLATFORM_CONFIGS.LEVEL_1,
+        goalScore: 10
     }
 }; 
    

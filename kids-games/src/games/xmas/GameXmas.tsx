@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { PlayerState, Platform, PlatformConfig, Snowball } from './types';
+import { PlayerState, Platform, PlatformConfig, Snowball, GameState, LevelConfig } from './types';
 import { PlatformSystem } from '../core/systems/PlatformSystem';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
-import { INITIAL_PLATFORMS, PLAYER_SPEED, GROUND_Y, DEFAULT_PLATFORM_CONFIGS } from './constants';
+import { INITIAL_PLATFORMS, PLAYER_SPEED, GROUND_Y, DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
 import { SwipeState, createSwipeState } from '../core/controllers/SwipeController';
 import { JumpIndicator } from './components/JumpIndicator';
 import { PlatformGenerator } from '../core/systems/PlatformGenerator';
@@ -31,7 +31,12 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
     const [levelScroll, setLevelScroll] = useState(0);
     const [snowballs, setSnowballs] = useState<Snowball[]>([]);
-    const [score, setScore] = useState(0);
+    const [gameState, setGameState] = useState<GameState>({
+        score: 0,
+        timeElapsed: 0,
+        isLevelComplete: false,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore
+    });
 
     useEffect(() => {
         setPlatforms(PlatformGenerator.generateLevel(platformConfig));
@@ -41,14 +46,40 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         setSnowballs(SnowballSystem.generateSnowballs(platformConfig));
     }, [platformConfig]);
 
-    const checkPlatformRegeneration = useCallback(() => {
-        if (platformConfig.direction === 'horizontal') {
-            const lastPlatform = platforms[platforms.length - 1];
-            if (player.x > lastPlatform.x + lastPlatform.width) {
-                setPlatforms(PlatformGenerator.generateLevel(platformConfig));
-            }
+    const checkAndRegenerateContent = useCallback(() => {
+        const lastPlatform = platforms[platforms.length - 1];
+        
+        if (!gameState.isLevelComplete && 
+            lastPlatform.x + lastPlatform.width + levelScroll < 1500) {
+            
+            const visiblePlatforms = platforms.filter(p => 
+                p.x + p.width + levelScroll > -500
+            );
+
+            const visibleSnowballs = snowballs.filter(s => 
+                !s.collected && s.x + levelScroll > -500
+            );
+
+            const lastVisiblePlatform = visiblePlatforms[visiblePlatforms.length - 1];
+            const newStartX = lastVisiblePlatform.x + lastVisiblePlatform.width + 
+                platformConfig.platformSpecs.minGap;
+
+            const newPlatforms = PlatformGenerator.generateLevel({
+                ...platformConfig,
+                levelWidth: newStartX + 2000,
+                startX: newStartX
+            });
+
+            const newSnowballs = SnowballSystem.generateSnowballs({
+                ...platformConfig,
+                levelWidth: newStartX + 2000,
+                startX: newStartX
+            });
+
+            setPlatforms(visiblePlatforms.concat(newPlatforms));
+            setSnowballs(visibleSnowballs.concat(newSnowballs));
         }
-    }, [platforms, player.x, platformConfig]);
+    }, [platforms, snowballs, levelScroll, gameState.isLevelComplete, platformConfig]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         setSwipeState(newSwipeState);
@@ -67,6 +98,13 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     }, [player.isJumping]);
 
     const updateGame = useCallback((deltaTime: number) => {
+        if (gameState.isLevelComplete) return;
+
+        setGameState(prev => ({
+            ...prev,
+            timeElapsed: prev.timeElapsed + deltaTime
+        }));
+
         setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
 
         setPlatforms(prev => prev.map(platform => {
@@ -92,9 +130,18 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             SnowballSystem.checkCollisions(player, snowballs, levelScroll);
         
         if (collectedSnowballs.length > 0) {
-            setScore(prev => prev + collectedSnowballs.length);
+            setGameState(prev => {
+                const newScore = prev.score + collectedSnowballs.length;
+                return {
+                    ...prev,
+                    score: newScore,
+                    isLevelComplete: newScore >= prev.goalScore
+                };
+            });
             setSnowballs(remainingSnowballs);
         }
+
+        checkAndRegenerateContent();
 
         setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
             prev,
@@ -103,7 +150,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             deltaTime,
             levelScroll
         ));
-    }, [platforms, levelScroll, snowballs, player, platformConfig.scrollSpeed]);
+    }, [platforms, levelScroll, snowballs, player, platformConfig.scrollSpeed, gameState.isLevelComplete]);
 
     useGameLoop(updateGame);
 
@@ -115,7 +162,10 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 swipeState={swipeState}
                 levelScroll={levelScroll}
                 snowballs={snowballs}
-                score={score}
+                score={gameState.score}
+                timeElapsed={gameState.timeElapsed}
+                goalScore={gameState.goalScore}
+                isLevelComplete={gameState.isLevelComplete}
             />
             <JumpIndicator 
                 isVisible={player.isJumping}

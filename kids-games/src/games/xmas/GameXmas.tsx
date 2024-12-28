@@ -17,9 +17,11 @@ import { GiftSystem } from '../core/systems/GiftSystem';
 import { HouseSystem } from '../core/systems/HouseSystem';
 import { createPlayer, handleFlyPlayer, handleJumpPlayer, updateFlyPlayer } from '../core/entities/PlayerEntity';
 import { generatePlatforms, regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
-import { useLevel2State } from './hooks/useLevel2State';
+
 import { useLevel1State } from './hooks/useLevel1State';
+import { useLevel2State } from './hooks/useLevel2State';
 import { useLevel3State } from './hooks/useLevel3State';
+import { useLevel4State } from './hooks/useLevel4State';
 
 interface GameXmasProps {   
     onBack: () => void;
@@ -61,6 +63,12 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         gifts: [],
         score: 0,
         goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_3.goalScore
+    });
+    const [level4State, updateLevel4, updateLevel4Player] = useLevel4State({
+        gifts: [],
+        houses: [],
+        score: 0,
+        goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_4.goalScore
     });
     const resetLevel = (level: string) => {
         setLevelScroll(0);
@@ -141,56 +149,17 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         if (gameState.isLevelComplete) return;
 
         if (currentLevel === 'LEVEL_4') {
-            setPlayer(updateFlyPlayer(player, deltaTime));
-
-            setHouses(prev => 
-                HouseSystem.updateHouses(prev, -100 * deltaTime, deltaTime)
-                    .filter(house => house.x > -200)
-            );
-
-            if (houses.length < 3) {
-                setHouses(prev => [...prev, HouseSystem.generateHouse(800)]);
-            }
-
-            setGifts(prev => prev.map(gift => {
-                if (!gift.isDelivering) return gift;
-
-                const newY = gift.y + (gift.velocityY || 0) * deltaTime;
-                const newVelocityY = (gift.velocityY || 0) + 800 * deltaTime;
-
-                const { deliveredToHouse, updatedHouses } = 
-                    HouseSystem.checkGiftDelivery({ ...gift, y: newY }, houses);
-
-                if (deliveredToHouse) {
-                    setHouses(updatedHouses);
-                    setGameState(prev => ({
-                        ...prev,
-                        score: prev.score + 1,
-                        isLevelComplete: prev.score + 1 >= prev.goalScore
-                    }));
-                    return { ...gift, collected: true };
-                }
-
-                if (newY > GROUND_Y) {
-                    return { ...gift, collected: true };
-                }
-
-                return {
-                    ...gift,
-                    y: newY,
-                    velocityY: newVelocityY
-                };
-            }).filter(gift => !gift.collected));
-
+            setPlayer(updateLevel4Player(player, deltaTime));
+            updateLevel4(deltaTime, player);
+            setHouses(level4State.houses);
+            setGifts(level4State.gifts);
+            setGameState(prev => ({
+                ...prev,
+                score: level4State.score,
+                isLevelComplete: level4State.isLevelComplete
+            }));
+            
             if (player.dropGift) {
-                setGifts(prev => [...prev, {
-                    x: player.x,
-                    y: player.y,
-                    collected: false,
-                    createdAt: performance.now(),
-                    isDelivering: true,
-                    velocityY: 0
-                }]);
                 setPlayer(prev => ({ ...prev, dropGift: false }));
             }
         } else if (currentLevel === 'LEVEL_3') {

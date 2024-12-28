@@ -26,11 +26,11 @@ export const LevelSelector = ({ onSelectLevel, onBack }: LevelSelectorProps) => 
                 }}
             />
             
-            {['LEVEL_1', 'LEVEL_2', 'LEVEL_3'].map((level, index) => (
+            {['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'].map((level, index) => (
                 <Container 
                     key={level}
                     x={200}
-                    y={200 + index * 100}
+                    y={200 + index * 50}
                     eventMode="static" 
                     cursor="pointer"
                     onpointerdown={() => handleLevelClick(level)}

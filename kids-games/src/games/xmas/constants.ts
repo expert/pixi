@@ -169,6 +169,28 @@ export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
             maxHeight: 300
         },
         goalScore: 20
+    },
+    LEVEL_4: {
+        count: 20,
+        direction: 'horizontal',
+        scrollSpeed: -350,
+        levelWidth: 5000,
+        platformSpecs: {
+            minWidth: 100,
+            maxWidth: 300,
+            minGap: 150,
+            maxGap: 300,
+            minHeight: 10,
+            maxHeight: 300
+        },
+        snowballs: {
+            frequency: 0.3,
+            minSize: 20,
+            maxSize: 30,
+            minHeight: 50,
+            maxHeight: 100
+        },
+        goalScore: 10
     }
 }; 
    

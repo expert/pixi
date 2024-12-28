@@ -80,4 +80,14 @@ export interface Gift {
     y: number;
     collected: boolean;
     createdAt: number;
+    velocityY?: number;
+    isDelivering?: boolean;
+}
+
+export interface House {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    hasReceivedGift: boolean;
 } 

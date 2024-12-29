@@ -62,7 +62,7 @@ export interface GameState {
 
 export interface LevelConfig extends PlatformConfig {
     goalScore: number;
-    image?: string;
+    backgroundImage?: string;
 }
 
 export interface Projectile {

@@ -1,5 +1,5 @@
-import { Container, Graphics } from '@pixi/react';
-import { Platform, PlayerState, Snowball, House, AppSize } from '../types';
+import { Container, Graphics, Sprite } from '@pixi/react';
+import { Platform, PlayerState, Snowball, House, AppSize, LevelConfig } from '../types';
 import { Level1Scene } from './levels/Level1Scene';
 import { Level2Scene } from './levels/Level2Scene';
 import { Level3Scene } from './levels/Level3Scene';
@@ -21,6 +21,7 @@ interface GameSceneProps {
     isLevelComplete: boolean;
     onNextLevel: () => void;
     currentLevel: string;
+    currentLevelConfig: LevelConfig;
     projectiles: any[];
     snowmen: any[];
     gifts: any[];
@@ -28,10 +29,18 @@ interface GameSceneProps {
     size: AppSize;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts, houses, size }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, currentLevelConfig, projectiles, snowmen, gifts, houses, size }: GameSceneProps) => {
     return (
         <Container>
             {/* Common elements */}
+            <Sprite image={currentLevelConfig?.backgroundImage || "/images/Christmas Santa Claus Icon.png"}
+                x={0}
+                y={0}
+                anchor={0.0}
+                width={size.width}  
+                height={size.height} 
+                alpha={0.5}
+                /> 
             <Platforms platforms={platforms} levelScroll={levelScroll} />
             <Player player={player} />
             <CommonUI 

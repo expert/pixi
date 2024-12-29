@@ -61,43 +61,43 @@ export const JUMP_CONFIGS = {
   }
 }; 
 
-export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
-    LEVEL_1: {
-        count: 20,
-        direction: 'horizontal',
-        scrollSpeed: -150, // Negative value means moving left
-        levelWidth: 5000,  // 5000 pixels wide level
-        platformSpecs: {
-            minWidth: 100,
-            maxWidth: 300,
-            minGap: 150,
-            maxGap: 300,
-            minHeight: 10,
-            maxHeight: 300
-        },
-        snowballs: {
-            frequency: 0.3,    // 30% chance per platform
-            minSize: 20,
-            maxSize: 30,
-            minHeight: 50,     // Minimum height above platform
-            maxHeight: 100     // Maximum height above platform
-        }
-    }
-}; 
+// export const DEFAULT_PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
+//     LEVEL_1: {
+//         count: 20,
+//         direction: 'horizontal',
+//         scrollSpeed: -30, // Negative value means moving left
+//         levelWidth: 1000,  // 5000 pixels wide level
+//         platformSpecs: {
+//             minWidth: 100,
+//             maxWidth: 300,
+//             minGap: -350,
+//             maxGap: -100,
+//             minHeight: 10,
+//             maxHeight: 300
+//         },
+//         snowballs: {
+//             frequency: 0.3,    // 30% chance per platform
+//             minSize: 20,
+//             maxSize: 30,
+//             minHeight: 50,     // Minimum height above platform
+//             maxHeight: 100     // Maximum height above platform
+//         }
+//     }
+// }; 
 
 export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
     LEVEL_1: {
         count: 20,
         direction: 'horizontal',
-        scrollSpeed: -150,
-        levelWidth: 5000,
+        scrollSpeed: -10,
+        levelWidth: 10,
         platformSpecs: {
             minWidth: 100,
             maxWidth: 300,
-            minGap: 150,
-            maxGap: 300,
+            minGap: -10,
+            maxGap: 100,
             minHeight: 10,
-            // maxHeight: 300
+            maxHeight: 300
         },
         snowballs: {
             frequency: 0.3,

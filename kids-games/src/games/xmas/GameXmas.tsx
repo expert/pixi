@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
 import GameEngine from '../core/GameEngine';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { PlayerState, Platform, PlatformConfig, GameState, Projectile, Snowman, Gift, House, AppSize } from './types';
+import { PlayerState, Platform, PlatformConfig, GameState, Projectile, Snowman, Gift, House, AppSize, Snowball } from './types';
 import { PhysicsSystem } from '../core/systems/PhysicsSystem';
 import { GameScene } from './components/GameScene';
-import { DEFAULT_PLATFORM_CONFIGS, DEFAULT_LEVEL_CONFIGS } from './constants';
+import { DEFAULT_LEVEL_CONFIGS } from './constants';
 import { SwipeState, createSwipeState } from '../core/controllers/SwipeController';
 import { JumpIndicator } from './components/JumpIndicator';
 import { LevelSelector } from './components/LevelSelector';
@@ -28,7 +28,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         snowballs: [],
         score: 0,
         goalScore: DEFAULT_LEVEL_CONFIGS.LEVEL_1.goalScore,
-        size
+        size,
+        backgroundImage: '/images/Christmas Santa Claus Icon.png',
     });
     const [level3State, updateLevel3, updateLevel3Player] = useLevel3State({
         gifts: [],
@@ -61,7 +62,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const [player, setPlayer] = useState<PlayerState>(createPlayer(size ));
     const [platforms, setPlatforms] = useState<Platform[]>();
     const [swipeState, setSwipeState] = useState<SwipeState>(createSwipeState());
-    const [platformConfig] = useState<PlatformConfig>(DEFAULT_PLATFORM_CONFIGS.LEVEL_1);
+    const [platformConfig, setPlatformConfig] = useState<PlatformConfig | null>(null);
     const [levelScroll, setLevelScroll] = useState(0);
     const [snowballs, setSnowballs] = useState<Snowball[]>([]);
     const [projectiles, setProjectiles] = useState<Projectile[]>([]);
@@ -79,6 +80,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const onLevelSelect = useCallback((level: string) => {
         const newState = handleLevelSelect(level);
         setPlayer(newState.player);
+        console.log('newState.platforms', newState.platforms);
         setPlatforms(newState.platforms);
         setSnowballs(newState.snowballs);
         setGifts(newState.gifts);
@@ -91,14 +93,16 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const checkAndRegenerateContent = useCallback(() => {
         switch (currentLevel) {
             case 'LEVEL_1':
+                setPlatformConfig(DEFAULT_LEVEL_CONFIGS[currentLevel]);
                 setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, platformConfig, size)
+                    regeneratePlatforms(prev, levelScroll, DEFAULT_LEVEL_CONFIGS.LEVEL_1, size)
                 );
                 break;
             
             case 'LEVEL_2':
+                setPlatformConfig(DEFAULT_LEVEL_CONFIGS[currentLevel]);
                 setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, platformConfig, size)
+                    regeneratePlatforms(prev, levelScroll, DEFAULT_LEVEL_CONFIGS.LEVEL_2, size)
                 );
                 setSnowmen(prev => prev.filter(s => 
                     !s.hit && s.x + levelScroll > -size.width
@@ -142,11 +146,11 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         // Common platform-based level updates
         const updatePlatformBasedLevel = () => {
             checkAndRegenerateContent();
-            setLevelScroll(prev => prev + platformConfig.scrollSpeed * deltaTime);
-            setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig.scrollSpeed));
+            setLevelScroll(prev => prev + (platformConfig?.scrollSpeed || 0) * deltaTime);
+            setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig?.scrollSpeed || 0));
             setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
                 prev,
-                platforms,
+                platforms || [],
                 { horizontal: 0, vertical: 0, isJumping: prev.isJumping, jumpPressed: false },
                 deltaTime,
                 levelScroll,
@@ -167,7 +171,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 break;
 
             case 'LEVEL_2':
-                updateLevel2(deltaTime, platforms, levelScroll, size);
+                updateLevel2(deltaTime, platforms || [], levelScroll, size);
                 setProjectiles(level2State.projectiles);
                 setSnowmen(level2State.snowmen);
                 setGameState(prev => ({
@@ -180,7 +184,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
             case 'LEVEL_3':
                 setPlayer(updateLevel3Player(player, deltaTime, size));
-                updateLevel3(deltaTime, player);
+                updateLevel3(deltaTime, player, size);
                 setGifts(level3State.gifts);
                 setGameState(prev => ({
                     ...prev,
@@ -191,7 +195,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
             case 'LEVEL_4':
                 setPlayer(updateLevel4Player(player, deltaTime, size));
-                updateLevel4(deltaTime, player);
+                updateLevel4(deltaTime, player, size);
                 setHouses(level4State.houses);
                 setGifts(level4State.gifts);
                 setGameState(prev => ({
@@ -211,7 +215,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
             timeElapsed: prev.timeElapsed + deltaTime
         }));
     }, [
-        currentLevel, platforms, levelScroll, player, platformConfig.scrollSpeed,
+        currentLevel, platforms, levelScroll, player, platformConfig?.scrollSpeed,
         gameState.isLevelComplete, 
         updateLevel1, level1State,
         updateLevel2, level2State,
@@ -249,6 +253,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 isLevelComplete={gameState.isLevelComplete}
                 onNextLevel={handleNextLevel}
                 currentLevel={currentLevel}
+                currentLevelConfig={levelConfig}
                 projectiles={projectiles}
                 snowmen={snowmen}
                 gifts={gifts}

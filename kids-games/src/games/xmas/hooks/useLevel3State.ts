@@ -15,7 +15,7 @@ export const useLevel3State = (initialState: {
         isLevelComplete: false
     });
 
-    const updateLevel3 = (deltaTime: number, player: PlayerState) => {
+    const updateLevel3 = (deltaTime: number, player: PlayerState, size: AppSize ) => {
         setState(prevState => {
             // Update gifts
             const updatedGifts = GiftSystem.updateGifts(prevState.gifts);

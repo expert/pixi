@@ -8,12 +8,11 @@ export const useLevel1State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
-    image: string;
     size: AppSize;
+    backgroundImage?: string;
 }) => { 
     const [state, setState] = useState({
         ...initialState,
-        image: '/images/Christmas Santa Claus Icon.png',
         isLevelComplete: false
     });
 

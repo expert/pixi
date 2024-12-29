@@ -87,7 +87,7 @@ export const DEFAULT_LEVEL_CONFIGS: Record<string, LevelConfig> = {
                 max: 200
             }
         },
-        goalScore: 1
+        goalScore: 20
     },
     LEVEL_2: {
         count: 20,

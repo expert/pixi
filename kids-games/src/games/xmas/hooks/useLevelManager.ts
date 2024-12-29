@@ -24,7 +24,7 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig, size: Ap
             snowballs: [],
             gifts: [],
             player: createPlayer(size),
-            snowmen: ['LEVEL_2'].includes(level) ? [SnowmanSystem.generateSnowman()] : [],
+            snowmen: ['LEVEL_2'].includes(level) ? [SnowmanSystem.generateSnowman(size)] : [],
             houses: level === 'LEVEL_4' ? [HouseSystem.generateHouse(size.width, size)] : [],
             gameState: {
                 score: 0,

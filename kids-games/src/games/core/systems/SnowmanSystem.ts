@@ -1,4 +1,4 @@
-import { Snowman, Projectile } from '../../xmas/types';
+import { Snowman, Projectile, AppSize } from '../../xmas/types';
 import { 
     createSnowman, 
     updateSnowmanPosition, 
@@ -7,30 +7,33 @@ import {
 } from '../entities/SnowmanEntity';
 
 export class SnowmanSystem {
-    static generateSnowman(): Snowman {
-        // Random position at the top of the screen
-        const x = Math.random() * 100 + 200; // Random x position
-        const y = -50; // Start above the screen
-        return createSnowman(x, y);
+    static generateSnowman(size: AppSize): Snowman {
+        const x = Math.random() * (size.width - 100) + 50;
+        const y = -50;
+        const snowman = createSnowman(x, y);
+        console.log('Generated new snowman at:', { x, y });
+        return snowman;
     }
 
-    static shouldGenerateNewSnowman(currentSnowmen: Snowman[], goalScore: number, currentScore: number): boolean {
-        // Keep generating snowmen until goal is reached
-        const activeSnowmen = currentSnowmen.filter(s => !s.hit && s.y < 800).length;
+    static shouldGenerateNewSnowman(currentSnowmen: Snowman[], goalScore: number, currentScore: number, size: AppSize): boolean {
+        // Count only snowmen that are in play (not hit and on screen)
+        const activeSnowmen = currentSnowmen.filter(s => 
+            !s.hit && 
+            s.y > -100 && 
+            s.y < size.height - 100
+        ).length;
+        
         const remainingNeeded = goalScore - currentScore;
         
-        // Generate more frequently if we need more hits
-        const baseChance = 0.1; // Increased base chance
-        const dynamicChance = Math.min(0.3, baseChance + (remainingNeeded * 0.02));
-        
-        return activeSnowmen < 5 && remainingNeeded > 0 && Math.random() < dynamicChance;
+        // Generate more frequently when fewer snowmen are active
+        return activeSnowmen < 3 && remainingNeeded > 0;
     }
 
-    static updateSnowmen(snowmen: Snowman[], deltaTime: number): Snowman[] {
+    static updateSnowmen(snowmen: Snowman[], deltaTime: number, size: AppSize): Snowman[] {
         const currentTime = performance.now();
         return snowmen
             .map(snowman => updateSnowmanPosition(snowman, deltaTime))
-            .filter(snowman => isSnowmanActive(snowman, currentTime));
+            .filter(snowman => isSnowmanActive(snowman, currentTime, size));
     }
 
     static checkSnowmanHits(

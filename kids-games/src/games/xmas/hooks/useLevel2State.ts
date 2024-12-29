@@ -62,25 +62,32 @@ export const useLevel2State = (initialState: {
         .filter(p => p.active);
 
       // Update snowmen
-      let updatedSnowmen = SnowmanSystem.updateSnowmen(prevState.snowmen, deltaTime);
-      if (SnowmanSystem.shouldGenerateNewSnowman(updatedSnowmen, prevState.goalScore, prevState.score)) {
-        updatedSnowmen = [...updatedSnowmen, SnowmanSystem.generateSnowman()];
+      let updatedSnowmen = SnowmanSystem.updateSnowmen(prevState.snowmen, deltaTime, size);
+      
+      // Generate new snowmen if needed
+      if (SnowmanSystem.shouldGenerateNewSnowman(updatedSnowmen, prevState.goalScore, prevState.score, size)) {
+        const newSnowman = SnowmanSystem.generateSnowman(size);
+        updatedSnowmen = [...updatedSnowmen, newSnowman];
       }
 
       // Check hits
-      const { hits, remainingSnowmen } = ShootingSystem.checkSnowmanHits(activeProjectiles, updatedSnowmen);
-      const newScore = prevState.score + hits;
+      const { hits, remainingSnowmen } = SnowmanSystem.checkSnowmanHits(activeProjectiles, updatedSnowmen);
+
+      // Debug log before returning new state
+      console.log('Updating state with snowmen:', remainingSnowmen);
 
       return {
+        ...prevState,
         projectiles: activeProjectiles,
         snowmen: remainingSnowmen,
-        score: newScore,
-        goalScore: prevState.goalScore,
-        isLevelComplete: newScore >= prevState.goalScore,
-        size: prevState.size
+        score: prevState.score + hits,
+        isLevelComplete: (prevState.score + hits) >= prevState.goalScore
       };
     });
   };
+
+  // Add debug log for state
+  console.log('Current Level2 state:', state);
 
   return [state, updateLevel2, handleShot] as const;
 };

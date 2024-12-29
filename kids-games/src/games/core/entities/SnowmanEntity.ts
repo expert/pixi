@@ -1,30 +1,44 @@
-import { Snowman } from "../../xmas/types";
+import { AppSize, Snowman } from "../../xmas/types";
 
 export const createSnowman = (x: number, y: number): Snowman => ({
     x,
     y,
     hit: false,
     createdAt: performance.now(),
-    duration: 8000,
-    velocityX: -50,
-    velocityY: 150
+    duration: 10000,
+    velocityX: Math.random() * 6 - 3,
+    velocityY: 50
 });
 
 export const updateSnowmanPosition = (
-    snowman: Snowman, 
+    snowman: Snowman,  
     deltaTime: number
-): Snowman => ({
-    ...snowman,
-    x: snowman.x + snowman.velocityX * deltaTime,
-    y: snowman.y + snowman.velocityY * deltaTime
-});
+): Snowman => {
+    const clampedDelta = Math.min(deltaTime, 0.1);
+    
+    const newX = Math.max(20, Math.min(410, snowman.x + snowman.velocityX * clampedDelta));
+    const newY = snowman.y + snowman.velocityY * clampedDelta;
+    
+    return {
+        ...snowman,
+        x: newX,
+        y: newY
+    };
+};
 
 export const isSnowmanActive = (
     snowman: Snowman, 
-    currentTime: number
+    currentTime: number,
+    size: AppSize
 ): boolean => {
-    const age = currentTime - snowman.createdAt;
-    return age < snowman.duration && !snowman.hit && snowman.y < 800;
+    const isWithinBounds = !snowman.hit && 
+                          snowman.y < size.height + 50 &&
+                          snowman.x >= -50 &&  
+                          snowman.x <= size.width + 50;
+                          
+    const isWithinDuration = (currentTime - snowman.createdAt) < snowman.duration;
+    
+    return isWithinBounds && isWithinDuration;
 };
 
 export const checkProjectileHit = (

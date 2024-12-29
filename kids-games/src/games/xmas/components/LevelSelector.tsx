@@ -36,7 +36,7 @@ export const LevelSelector = ({ onSelectLevel, onBack, size}: LevelSelectorProps
                 height={size.height} 
               />
             
-            {['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'].map((level, index) => (
+            {['LEVEL_1', 'LEVEL_2', 'LEVEL_3'].map((level, index) => (
                 <Container 
                     key={level}
                     x={size.width / 2 - 200}

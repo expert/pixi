@@ -11,7 +11,6 @@ export class SnowmanSystem {
         const x = Math.random() * (size.width - 100) + 50;
         const y = -50;
         const snowman = createSnowman(x, y);
-        console.log('Generated new snowman at:', { x, y });
         return snowman;
     }
 

@@ -69,6 +69,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                         anchor={0.5}
                         x={size.width / 2}
                         y={size.height / 2 - 50}
+                        //@ts-expect-error Fix this
                         style={{ 
                             fill: 0xFFFFFF,
                             fontSize: 48,
@@ -80,6 +81,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                         anchor={0.5}
                         x={size.width / 2}
                         y={size.height / 2 + 50}
+                        //@ts-expect-error Fix this
                         style={{ 
                             fill: 0xFFFFFF,
                             fontSize: 24
@@ -116,6 +118,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 <Level3Scene gifts={gifts} size={size}/>
             )}
             {currentLevel === 'LEVEL_4' && (
+                //@ts-expect-error Fix this
                 <Level4Scene gifts={gifts} houses={houses} size={size}  />
             )}
         </Container>

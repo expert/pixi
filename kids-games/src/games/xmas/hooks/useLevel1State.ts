@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { SnowballSystem } from '../../core/systems/SnowballSystem';
-import { PlayerState, Platform, LevelConfig, AppSize, Snowball } from '../types';
+import { PlayerState, Platform, LevelConfig, AppSize, Snowball, Level1State } from '../types';
 import { SwipeState } from '../../core/controllers/SwipeController';
 import { handleJumpPlayer } from '../../core/entities/PlayerEntity'
 import { DEFAULT_LEVEL_CONFIGS } from '../constants';

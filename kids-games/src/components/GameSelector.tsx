@@ -33,9 +33,9 @@ const GameSelector = ({ onSelectGame }: GameSelectorProps) => {
       <GameButton onClick={() => onSelectGame('gameXmas')}>
         Game Xmas
       </GameButton>
-      <GameButton onClick={() => onSelectGame('gameBatman')}>
+      {/* <GameButton onClick={() => onSelectGame('gameBatman')}>
         Game Batman
-      </GameButton>
+      </GameButton> */}
     </SelectorContainer>
   );
 };

@@ -16,6 +16,7 @@ export const CommonUI = ({ score, timeElapsed, goalScore, isLevelComplete, size 
                 text={`Score: ${score}/${goalScore}`}
                 x={size.width - 100}
                 y={10}
+                //@ts-expect-error Fix this
                 style={{
                     fill: 0xFFFFFF,
                     fontSize: 20

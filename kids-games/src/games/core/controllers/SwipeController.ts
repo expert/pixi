@@ -1,4 +1,7 @@
-import { Vector2D } from '../types/geometry';
+type Vector2D = {
+  x: number;
+  y: number;
+};
 
 export type SwipeDirection = 'UP' | 'UP_LEFT' | 'UP_RIGHT' | 'DOWN' | 'NONE';
 

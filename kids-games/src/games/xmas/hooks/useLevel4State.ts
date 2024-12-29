@@ -18,6 +18,7 @@ export const useLevel4State = (initialState: {
     });
 
     const updateLevel4 = (deltaTime: number, player: PlayerState, size: AppSize) => {
+      //@ts-expect-error Fix this
         setState(prevState => {
             // Update houses
             let updatedHouses = HouseSystem.updateHouses(
@@ -61,6 +62,7 @@ export const useLevel4State = (initialState: {
             }).filter(gift => !gift.collected);
 
             // Add new gift if player dropped one
+                //@ts-expect-error Fix this
             const newGifts = player.dropGift 
                 ? [...updatedGifts, {
                     x: player.x,

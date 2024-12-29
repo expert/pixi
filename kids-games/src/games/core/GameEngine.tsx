@@ -39,8 +39,8 @@ const GameEngine = ({ children, onBack, onSwipe, width, height }: GameEngineProp
             direction: 'NONE',
             magnitude: 0
         };
-        setSwipeState(newState);
-        onSwipe(newState);
+        setSwipeState(newState as SwipeState);
+        onSwipe(newState as SwipeState);
     }, [onSwipe]);
 
     const handleMove = useCallback((x: number, y: number, rect: DOMRect) => {

@@ -11,7 +11,6 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig, size: Ap
     const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
 
     const handleLevelSelect = useCallback((level: string) => {
-        console.log('handleLevelSelect', level);
         setCurrentLevel(level);
         const _levelConfig = DEFAULT_LEVEL_CONFIGS[level];
         setLevelConfig(_levelConfig);
@@ -43,11 +42,10 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig, size: Ap
     }, [size, initializeLevel1]);
 
     const handleNextLevel = useCallback(() => {
-        const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'];
+        const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3'];
         const currentIndex = levels.indexOf(currentLevel!);
         if (currentIndex < levels.length - 1) {
             const nextLevel = levels[currentIndex + 1];
-            console.log('Moving to next level:', nextLevel);
             setCurrentLevel(nextLevel);
             return nextLevel;
         }

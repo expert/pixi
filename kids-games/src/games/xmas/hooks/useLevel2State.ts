@@ -72,10 +72,6 @@ export const useLevel2State = (initialState: {
 
       // Check hits
       const { hits, remainingSnowmen } = SnowmanSystem.checkSnowmanHits(activeProjectiles, updatedSnowmen);
-
-      // Debug log before returning new state
-      console.log('Updating state with snowmen:', remainingSnowmen);
-
       return {
         ...prevState,
         projectiles: activeProjectiles,
@@ -85,9 +81,6 @@ export const useLevel2State = (initialState: {
       };
     });
   };
-
-  // Add debug log for state
-  console.log('Current Level2 state:', state);
 
   return [state, updateLevel2, handleShot] as const;
 };

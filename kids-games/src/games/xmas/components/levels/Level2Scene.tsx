@@ -11,7 +11,6 @@ interface Level2SceneProps {
 }
 
 export const Level2Scene = ({ projectiles, snowmen, size }: Level2SceneProps) => {
-    console.log('Level2Scene props:', { projectiles, snowmen, size });
     
     return (
         <Container>

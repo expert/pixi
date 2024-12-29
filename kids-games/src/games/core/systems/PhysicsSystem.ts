@@ -6,7 +6,6 @@ import { JUMP_CONFIGS } from '../../xmas/constants';
 
 export class PhysicsSystem {
     static startJump(player: PlayerState): PlayerState {
-        console.log('startJump', player);
         if (!player.isJumping) {
             return {
                 ...player,

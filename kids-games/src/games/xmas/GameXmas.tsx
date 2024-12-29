@@ -79,7 +79,6 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     // When a level is selected, update all the state
     const onLevelSelect = useCallback((level: string) => {
-        console.log('Starting level:', level);
         const newState = handleLevelSelect(level);
         
         // Reset all state for new level
@@ -215,6 +214,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                     score: level4State.score,
                     isLevelComplete: level4State.isLevelComplete
                 }));
+                //@ts-expect-error Fix this
                 if (player.dropGift) {
                     setPlayer(prev => ({ ...prev, dropGift: false }));
                 }

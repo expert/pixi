@@ -10,6 +10,7 @@ import { JumpIndicator } from './components/JumpIndicator';
 import { LevelSelector } from './components/LevelSelector';
 import { createPlayer, handleFlyPlayer } from '../core/entities/PlayerEntity';
 import { regeneratePlatforms, updatePlatforms } from '../core/entities/PlatformEntity';
+import { SnowballSystem } from '../core/systems/SnowballSystem';
 
 import { useLevelManager } from './hooks/useLevelManager';
 import { useLevel1State } from './hooks/useLevel1State';
@@ -80,7 +81,6 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     const onLevelSelect = useCallback((level: string) => {
         const newState = handleLevelSelect(level);
         setPlayer(newState.player);
-        console.log('newState.platforms', newState.platforms);
         setPlatforms(newState.platforms);
         setSnowballs(newState.snowballs);
         setGifts(newState.gifts);
@@ -113,7 +113,9 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         currentLevel, 
         levelScroll, 
         platformConfig,
-        size
+        size,
+        gameState.score,
+        gameState.goalScore
     ]);
 
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {

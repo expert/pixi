@@ -36,11 +36,12 @@ export interface PlatformConfig {
     scrollSpeed: number;
     levelWidth: number;
     startX?: number;
+    pattern?: 'STAIR_UP' | 'STAIR_DOWN' | 'MAZE' | 'ZIGZAG' | 'RANDOM';
     platformSpecs: {
         minWidth: number;
         maxWidth: number;
-        minGap: number;  // Minimum gap between platforms
-        maxGap: number;  // Maximum gap between platforms
+        minGap: number;
+        maxGap: number;
         minHeight: number;
         maxHeight: number;
     };
@@ -50,6 +51,10 @@ export interface PlatformConfig {
         maxSize: number;
         minHeight: number;
         maxHeight: number;
+        spacing?: {
+            min: number;
+            max: number;
+        };
     };
 }
 
@@ -105,4 +110,13 @@ export interface Snowball {
     y: number;
     size: number;
     collected: boolean;
+}
+
+export interface Level1State {
+    snowballs: Snowball[];
+    score: number;
+    goalScore: number;
+    isLevelComplete?: boolean;
+    size: AppSize;
+    backgroundImage?: string;
 } 

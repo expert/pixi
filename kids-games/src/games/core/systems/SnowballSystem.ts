@@ -2,33 +2,54 @@ import { Snowball, PlatformConfig, PlayerState, AppSize } from '../../xmas/types
 import { PLAYER_HEIGHT } from '../../xmas/constants';
 
 export class SnowballSystem {
-    static generateSnowballs(config: PlatformConfig, size: AppSize): Snowball[] {
-        const snowballs: Snowball[] = [];
-        let currentX = config.startX || size.width; // Use provided startX or default
+    static generateSnowballs(
+        config: PlatformConfig, 
+        size: AppSize, 
+        currentScore: number,
+        goalScore: number,
+        existingSnowballs: Snowball[] = []
+    ): Snowball[] {
+        // Don't generate more snowballs if goal is reached
+        if (currentScore >= goalScore) {
+            return existingSnowballs;
+        }
+
+        // Keep existing snowballs that are still valid
+        const lastSnowball = existingSnowballs[existingSnowballs.length - 1];
+        const startX = lastSnowball ? lastSnowball.x + 100 : (config.startX || size.width);
+        
+        const newSnowballs: Snowball[] = [];
+        let currentX = startX;
         
         while (currentX < config.levelWidth) {
-            // Random spacing between snowballs
-            const spacing = Math.random() * 300 + 200; // 200-500px spacing
+            const spacing = config.snowballs.spacing ? 
+                Math.random() * 
+                    (config.snowballs.spacing.max - config.snowballs.spacing.min) + 
+                    config.snowballs.spacing.min
+                : Math.random() * 300 + 200;
             
-            const snowballSize = Math.random() * 
-                (config.snowballs.maxSize - config.snowballs.minSize) + 
-                config.snowballs.minSize;
-            
-            const maxHeight = size.height - PLAYER_HEIGHT - snowballSize;
-            const minHeight = maxHeight * 0.2; // Keep some margin from top (20% of available height)
-            const height = Math.random() * (maxHeight - minHeight) + minHeight;
-            
-            snowballs.push({
-                x: currentX,
-                y: height,
-                size: snowballSize,
-                collected: false
-            });
+            // More frequent snowball generation
+            if (Math.random() < config.snowballs.frequency) {
+                const snowballSize = Math.random() * 
+                    (config.snowballs.maxSize - config.snowballs.minSize) + 
+                    config.snowballs.minSize;
+                
+                const maxHeight = size.height - PLAYER_HEIGHT - snowballSize;
+                const minHeight = maxHeight * 0.1; // Lower minimum height for better distribution
+                const height = Math.random() * (maxHeight - minHeight) + minHeight;
+                
+                newSnowballs.push({
+                    x: currentX,
+                    y: height,
+                    size: snowballSize,
+                    collected: false
+                });
+            }
             
             currentX += spacing;
         }
         
-        return snowballs;
+        return [...existingSnowballs, ...newSnowballs];
     }
 
     static checkCollisions(player: PlayerState, snowballs: Snowball[], levelScroll: number): {

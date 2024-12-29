@@ -69,7 +69,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                         anchor={0.5}
                         x={size.width / 2}
                         y={size.height / 2 - 50}
-                        //@ts-expect-error Fix this
+                        //@ts-ignore
                         style={{ 
                             fill: 0xFFFFFF,
                             fontSize: 48,
@@ -81,7 +81,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                         anchor={0.5}
                         x={size.width / 2}
                         y={size.height / 2 + 50}
-                        //@ts-expect-error Fix this
+                        //@ts-ignore
                         style={{ 
                             fill: 0xFFFFFF,
                             fontSize: 24

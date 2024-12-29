@@ -8,6 +8,7 @@ import { CommonUI } from './CommonUI';
 import { Platforms } from './Platforms';
 import { Player } from './Player';
 import { SwipeState } from '../../core/controllers/SwipeController';
+import { WinConfetti } from './WinConfetti';
 
 interface GameSceneProps {
     platforms: Platform[];
@@ -62,6 +63,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                             g.endFill();
                         }}
                     />
+                    <WinConfetti size={size} />
                     <Text 
                         text="Bravo Stefan!"
                         anchor={0.5}

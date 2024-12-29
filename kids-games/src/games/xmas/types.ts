@@ -62,6 +62,7 @@ export interface GameState {
 
 export interface LevelConfig extends PlatformConfig {
     goalScore: number;
+    image?: string;
 }
 
 export interface Projectile {
@@ -79,6 +80,7 @@ export interface Snowman {
     createdAt: number;
     duration: number;
     velocityX: number;
+    velocityY: number;
 }
 
 export interface Gift {

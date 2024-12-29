@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SnowballSystem } from '../../core/systems/SnowballSystem';
-import { PlayerState, Platform, LevelConfig, AppSize } from '../types';
+import { PlayerState, Platform, LevelConfig, AppSize, Snowball } from '../types';
 import { SwipeState } from '../../core/controllers/SwipeController';
 import { handleJumpPlayer } from '../../core/entities/PlayerEntity'
 export const useLevel1State = (initialState: {
@@ -8,10 +8,12 @@ export const useLevel1State = (initialState: {
     score: number;
     goalScore: number;
     isLevelComplete?: boolean;
+    image: string;
     size: AppSize;
 }) => { 
     const [state, setState] = useState({
         ...initialState,
+        image: '/images/Christmas Santa Claus Icon.png',
         isLevelComplete: false
     });
 
@@ -32,6 +34,7 @@ export const useLevel1State = (initialState: {
             const newScore = prevState.score + collectedSnowballs.length;
 
             return {
+                ...prevState,
                 snowballs: remainingSnowballs,
                 score: newScore,
                 goalScore: prevState.goalScore,

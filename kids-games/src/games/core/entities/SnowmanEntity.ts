@@ -6,7 +6,8 @@ export const createSnowman = (x: number, y: number): Snowman => ({
     hit: false,
     createdAt: performance.now(),
     duration: 8000,
-    velocityX: -200
+    velocityX: -200,
+    velocityY: 50
 });
 
 export const updateSnowmanPosition = (

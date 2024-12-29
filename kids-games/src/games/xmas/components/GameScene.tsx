@@ -1,5 +1,5 @@
 import { Container, Graphics } from '@pixi/react';
-import { Platform, PlayerState, SwipeState, Snowball, House } from '../types';
+import { Platform, PlayerState, Snowball, House, AppSize } from '../types';
 import { Level1Scene } from './levels/Level1Scene';
 import { Level2Scene } from './levels/Level2Scene';
 import { Level3Scene } from './levels/Level3Scene';
@@ -7,6 +7,7 @@ import { Level4Scene } from './levels/Level4Scene';
 import { CommonUI } from './CommonUI';
 import { Platforms } from './Platforms';
 import { Player } from './Player';
+import { SwipeState } from '../../core/controllers/SwipeController';
 
 interface GameSceneProps {
     platforms: Platform[];
@@ -24,11 +25,10 @@ interface GameSceneProps {
     snowmen: any[];
     gifts: any[];
     houses?: House[];
-    width: number;
-    height: number;
+    size: AppSize;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts, houses, width, height }: GameSceneProps) => {
+export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, projectiles, snowmen, gifts, houses, size }: GameSceneProps) => {
     return (
         <Container>
             {/* Common elements */}
@@ -39,8 +39,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 timeElapsed={timeElapsed}
                 goalScore={goalScore}
                 isLevelComplete={isLevelComplete}
-                width={width}
-                height={height}
+                size={size}
             />
 
             {/* Swipe indicator */}
@@ -59,16 +58,16 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
 
             {/* Level-specific scenes */}
             {currentLevel === 'LEVEL_1' && (
-                <Level1Scene snowballs={snowballs} levelScroll={levelScroll} />
+                <Level1Scene snowballs={snowballs} levelScroll={levelScroll} size={size} />
             )}
             {currentLevel === 'LEVEL_2' && (
-                <Level2Scene projectiles={projectiles} snowmen={snowmen} />
+                <Level2Scene projectiles={projectiles} snowmen={snowmen} size={size}/>
             )}
             {currentLevel === 'LEVEL_3' && (
-                <Level3Scene gifts={gifts} />
+                <Level3Scene gifts={gifts} size={size}/>
             )}
             {currentLevel === 'LEVEL_4' && (
-                <Level4Scene gifts={gifts} houses={houses} />
+                <Level4Scene gifts={gifts} houses={houses} size={size}  />
             )}
         </Container>
     );

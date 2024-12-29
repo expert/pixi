@@ -228,8 +228,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 <LevelSelector 
                     onSelectLevel={onLevelSelect}
                     onBack={onBack}
-                    width={size.width}
-                    height={size.height}
+                    size={size}
                 />
             </GameEngine>
         );
@@ -238,9 +237,8 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
     return (
         <GameEngine onBack={onBack} onSwipe={handleSwipe} width={size.width} height={size.height}>
             <GameScene 
-                width={size.width}
-                height={size.height}
-                platforms={platforms} 
+                size={size}
+                platforms={platforms || []} 
                 player={player}
                 swipeState={swipeState}
                 levelScroll={levelScroll}

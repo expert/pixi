@@ -1,15 +1,15 @@
-import { Container, Text, Graphics } from '@pixi/react';
+import { Container, Text, Graphics, Sprite } from '@pixi/react';
 import { useCallback } from 'react';
 import '@pixi/events';
+import { AppSize, LevelConfig } from '../types';
 
 interface LevelSelectorProps {
     onSelectLevel: (level: string) => void;
     onBack: () => void;
-    width: number;
-    height: number;
+    size: AppSize;
 }
 
-export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSelectorProps) => {
+export const LevelSelector = ({ onSelectLevel, onBack, size}: LevelSelectorProps) => {
     const handleLevelClick = useCallback((level: string) => {
         console.log('Level selected:', level);
         onSelectLevel(level);
@@ -18,21 +18,29 @@ export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSel
     return (
         <Container>
             <Text 
-                text="Select Level"
-                x={width / 2}
-                y={150}
+                text="La Multi Ani Stefan"
+                x={size.width / 2}
+                y={170}
                 anchor={0.5}
                 style={{
                     fill: 0xFFFFFF,
-                    fontSize: 40
+                    fontSize: 35
                 }}
             />
+            <Sprite 
+                image={"/images/Christmas Decoration Santa Claus.png"}
+                x={0}
+                y={0}
+                anchor={0.0}
+                width={size.width}  
+                height={size.height} 
+              />
             
             {['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'].map((level, index) => (
                 <Container 
                     key={level}
-                    x={width / 2 - 200}
-                    y={200 + index * 70}
+                    x={size.width / 2 - 200}
+                    y={220 + index * 70}
                     eventMode="static" 
                     cursor="pointer"
                     onpointerdown={() => handleLevelClick(level)}
@@ -40,8 +48,8 @@ export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSel
                     <Graphics
                         draw={g => {
                             g.clear();
-                            g.beginFill(0x4444FF, 0.5);
-                            g.drawRoundedRect(0, 0, 400, 60, 10);
+                            g.beginFill(0xFFFFFF, 0.5);
+                            g.drawRoundedRect(0, 0, size.width - 30, 60, 10);
                             g.endFill();
                         }}
                     />
@@ -51,7 +59,7 @@ export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSel
                         y={30}
                         anchor={0.5}
                         style={{
-                            fill: 0xFFFFFF,
+                            fill: 0x4444FF,
                             fontSize: 24
                         }}
                     />
@@ -59,8 +67,8 @@ export const LevelSelector = ({ onSelectLevel, onBack, width, height }: LevelSel
             ))}
 
             <Container 
-                y={500}
-                x={width / 2 - 50}
+                y={520}
+                x={size.width / 2 - 50}
                 eventMode="static" 
                 cursor="pointer"
                 onpointerdown={onBack}

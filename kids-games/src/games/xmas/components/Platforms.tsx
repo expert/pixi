@@ -1,4 +1,4 @@
-import { Container, Graphics } from '@pixi/react';
+import { Container, Graphics, Sprite } from '@pixi/react';
 import { Platform } from '../types';
 
 interface PlatformsProps {
@@ -19,6 +19,16 @@ export const Platforms = ({ platforms, levelScroll }: PlatformsProps) => {
                     g.endFill();
                 }}
             />
+            { platforms.map(platform => (
+                <Sprite 
+                    image="/images/Santa_Claus_Sled_PNG.png"
+                    x={platform.x + platform.width / 2}
+                    y={platform.y}
+                    anchor={0.5}
+                    width={platform.width}  // Match PLAYER_HEIGHT
+                    height={70} // Keep aspect ratio square
+                />
+            ))}
         </Container>
     );
 }; 

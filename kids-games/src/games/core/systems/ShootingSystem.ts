@@ -5,7 +5,7 @@ export class ShootingSystem {
     static startShot(player: PlayerState, swipeState: SwipeState, size: AppSize): Projectile | null {
         if (!swipeState.startPoint || !swipeState.endPoint) return null;
 
-        const baseSpeed = Math.min(swipeState.magnitude * 2, size.width - 50);
+        const baseSpeed = Math.min(swipeState.magnitude * 8, size.height - 50);
         
         const dx = swipeState.startPoint.x - swipeState.endPoint.x;
         const dy = swipeState.startPoint.y - swipeState.endPoint.y;
@@ -20,8 +20,8 @@ export class ShootingSystem {
         };
     }
 
-    static updateProjectile(projectile: Projectile, platforms: Platform[], deltaTime: number): Projectile {
-        const gravity = 800;
+    static updateProjectile(projectile: Projectile, platforms: Platform[], size: AppSize, deltaTime: number): Projectile {
+        const gravity = 500;
         const newY = projectile.y + projectile.velocityY * deltaTime;
         const newX = projectile.x + projectile.velocityX * deltaTime;
         
@@ -32,8 +32,8 @@ export class ShootingSystem {
             newY >= platform.y && 
             newY <= platform.y + 10
         );
-
-        if (hitsPlatform || newY > 500) {
+        
+        if (hitsPlatform || newY < 0 || newY > size.height) {
             return { ...projectile, active: false };
         }
 

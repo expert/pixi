@@ -1,13 +1,16 @@
 import { Graphics } from "@pixi/react";
 
 import { Container } from "@pixi/react";
+import { AppSize, Projectile } from "../../types";
+import { Snowman } from "../../types";
 
 interface Level2SceneProps {
     projectiles: Projectile[];
     snowmen: Snowman[];
+    size: AppSize;
 }
 
-export const Level2Scene = ({ projectiles, snowmen }: Level2SceneProps) => {
+export const Level2Scene = ({ projectiles, snowmen, size }: Level2SceneProps) => {
     return (
         <Container>
             <Graphics

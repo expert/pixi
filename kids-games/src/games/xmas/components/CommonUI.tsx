@@ -1,20 +1,20 @@
 import { Container, Text } from "@pixi/react";
+import { AppSize } from "../types";
 
 interface CommonUIProps {
     score: number;
     timeElapsed: number;
     goalScore: number;
     isLevelComplete: boolean;
-    width: number;
-    height: number;
+    size: AppSize;
 }
 
-export const CommonUI = ({ score, timeElapsed, goalScore, isLevelComplete, width, height }: CommonUIProps) => {
+export const CommonUI = ({ score, timeElapsed, goalScore, isLevelComplete, size }: CommonUIProps) => {
     return (
         <Container>
             <Text 
                 text={`Score: ${score}/${goalScore}`}
-                x={width - 100}
+                x={size.width - 100}
                 y={10}
                 style={{
                     fill: 0xFFFFFF,

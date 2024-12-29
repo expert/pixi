@@ -1,11 +1,12 @@
 import { Container, Graphics } from '@pixi/react';
-import { Gift } from '../../types';
+import { Gift, AppSize } from '../../types';
 
 interface Level3SceneProps {
     gifts: Gift[];
+    size: AppSize;
 }
 
-export const Level3Scene = ({ gifts }: Level3SceneProps) => {
+export const Level3Scene = ({ gifts, size }: Level3SceneProps) => {
     return (
         <Graphics
             draw={g => {

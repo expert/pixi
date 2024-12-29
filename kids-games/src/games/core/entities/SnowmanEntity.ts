@@ -6,8 +6,8 @@ export const createSnowman = (x: number, y: number): Snowman => ({
     hit: false,
     createdAt: performance.now(),
     duration: 8000,
-    velocityX: -200,
-    velocityY: 50
+    velocityX: -50,
+    velocityY: 150
 });
 
 export const updateSnowmanPosition = (
@@ -15,7 +15,8 @@ export const updateSnowmanPosition = (
     deltaTime: number
 ): Snowman => ({
     ...snowman,
-    x: snowman.x + snowman.velocityX * deltaTime
+    x: snowman.x + snowman.velocityX * deltaTime,
+    y: snowman.y + snowman.velocityY * deltaTime
 });
 
 export const isSnowmanActive = (
@@ -23,7 +24,7 @@ export const isSnowmanActive = (
     currentTime: number
 ): boolean => {
     const age = currentTime - snowman.createdAt;
-    return age < snowman.duration && !snowman.hit && snowman.x > -100;
+    return age < snowman.duration && !snowman.hit && snowman.y < 800;
 };
 
 export const checkProjectileHit = (

@@ -8,21 +8,29 @@ import {
 
 export class SnowmanSystem {
     static generateSnowman(): Snowman {
-        const x = 1000; // Fixed position off-screen to the right
-        const y = Math.random() * 300 + 200; // Random height
+        // Random position at the top of the screen
+        const x = Math.random() * 100 + 200; // Random x position
+        const y = -50; // Start above the screen
         return createSnowman(x, y);
+    }
+
+    static shouldGenerateNewSnowman(currentSnowmen: Snowman[], goalScore: number, currentScore: number): boolean {
+        // Keep generating snowmen until goal is reached
+        const activeSnowmen = currentSnowmen.filter(s => !s.hit && s.y < 800).length;
+        const remainingNeeded = goalScore - currentScore;
+        
+        // Generate more frequently if we need more hits
+        const baseChance = 0.1; // Increased base chance
+        const dynamicChance = Math.min(0.3, baseChance + (remainingNeeded * 0.02));
+        
+        return activeSnowmen < 5 && remainingNeeded > 0 && Math.random() < dynamicChance;
     }
 
     static updateSnowmen(snowmen: Snowman[], deltaTime: number): Snowman[] {
         const currentTime = performance.now();
-        
         return snowmen
             .map(snowman => updateSnowmanPosition(snowman, deltaTime))
             .filter(snowman => isSnowmanActive(snowman, currentTime));
-    }
-
-    static shouldGenerateNewSnowman(): boolean {
-        return Math.random() < 0.02;
     }
 
     static checkSnowmanHits(

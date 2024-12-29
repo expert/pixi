@@ -31,14 +31,39 @@ export const useLevel2State = (initialState: {
 
   const updateLevel2 = (deltaTime: number, platforms: Platform[], levelScroll: number, size: AppSize) => {
     setState((prevState) => {
-      // Update projectiles
-      const activeProjectiles = ShootingSystem.checkPlatformHits(prevState.projectiles, platforms, levelScroll)
+      // Update projectiles with platform collision check
+      const activeProjectiles = prevState.projectiles
         .filter((p) => p.active)
-        .map((p) => ShootingSystem.updateProjectile(p, platforms, size, deltaTime));
+        .map((p) => {
+          const newX = p.x + p.velocityX * deltaTime;
+          const newY = p.y + p.velocityY * deltaTime;
+          const newVelocityY = p.velocityY + 500 * deltaTime;
+
+          // Check platform collisions
+          const hitsPlatform = platforms.some(platform => {
+            const platformX = platform.x + levelScroll;
+            return newX >= platformX && 
+                   newX <= platformX + platform.width &&
+                   newY >= platform.y && 
+                   newY <= platform.y + 10;
+          });
+
+          // Deactivate if hits platform or goes below screen
+          const active = !hitsPlatform && newY < size.height;
+
+          return {
+            ...p,
+            x: newX,
+            y: newY,
+            velocityY: newVelocityY,
+            active
+          };
+        })
+        .filter(p => p.active);
 
       // Update snowmen
       let updatedSnowmen = SnowmanSystem.updateSnowmen(prevState.snowmen, deltaTime);
-      if (updatedSnowmen.length < 3 && SnowmanSystem.shouldGenerateNewSnowman()) {
+      if (SnowmanSystem.shouldGenerateNewSnowman(updatedSnowmen, prevState.goalScore, prevState.score)) {
         updatedSnowmen = [...updatedSnowmen, SnowmanSystem.generateSnowman()];
       }
 

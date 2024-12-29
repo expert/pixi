@@ -10,62 +10,49 @@ export const useLevelManager = (initializeLevel1: (config: LevelConfig, size: Ap
     const [currentLevel, setCurrentLevel] = useState<string | null>(null);
     const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
 
-    const resetLevel = useCallback((level: string) => {
-        return {
-            levelScroll: 0,
-            platforms: [],
-            snowballs: [],
-            gifts: [],
-            player: createPlayer(size),
-            gameState: {
-                score: 0,
-                timeElapsed: 0,
-                isLevelComplete: false,
-                goalScore: DEFAULT_LEVEL_CONFIGS[level].goalScore
-            }
-        };
-    }, []);
-
     const handleLevelSelect = useCallback((level: string) => {
+        console.log('handleLevelSelect', level);
         setCurrentLevel(level);
         const _levelConfig = DEFAULT_LEVEL_CONFIGS[level];
         setLevelConfig(_levelConfig);
 
-        const initialState = resetLevel(level);
-        if(!_levelConfig) return initialState;
+        const initialState = {
+            levelScroll: 0,
+            platforms: ['LEVEL_1', 'LEVEL_2'].includes(level) 
+                ? generatePlatforms(_levelConfig, size) 
+                : [],
+            snowballs: [],
+            gifts: [],
+            player: createPlayer(size),
+            snowmen: ['LEVEL_2'].includes(level) ? [SnowmanSystem.generateSnowman()] : [],
+            houses: level === 'LEVEL_4' ? [HouseSystem.generateHouse(size.width, size)] : [],
+            gameState: {
+                score: 0,
+                timeElapsed: 0,
+                isLevelComplete: false,
+                goalScore: _levelConfig.goalScore
+            }
+        };
 
-        const platforms = ['LEVEL_1', 'LEVEL_2'].includes(level) 
-            ? generatePlatforms(_levelConfig, size) 
-            : [];
-        
+        // Initialize level-specific state
         if (level === 'LEVEL_1') {
             initializeLevel1(_levelConfig, size);
         }
-        
-        const snowmen = ['LEVEL_2'].includes(level) 
-            ? [SnowmanSystem.generateSnowman()] 
-            : [];
 
-        const houses = level === 'LEVEL_4' 
-            ? [HouseSystem.generateHouse(size.width, size)] 
-            : [];
-
-        return {
-            ...initialState,
-            platforms,
-            snowmen,
-            houses
-        };
-    }, [resetLevel, initializeLevel1]);
+        return initialState;
+    }, [size, initializeLevel1]);
 
     const handleNextLevel = useCallback(() => {
         const levels = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4'];
         const currentIndex = levels.indexOf(currentLevel!);
         if (currentIndex < levels.length - 1) {
-            return handleLevelSelect(levels[currentIndex + 1]);
+            const nextLevel = levels[currentIndex + 1];
+            console.log('Moving to next level:', nextLevel);
+            setCurrentLevel(nextLevel);
+            return nextLevel;
         }
         return null;
-    }, [currentLevel, handleLevelSelect]);
+    }, [currentLevel]);
 
     return {
         currentLevel,

@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite } from '@pixi/react';
+import { Container, Graphics, Sprite, Text } from '@pixi/react';
 import { Platform, PlayerState, Snowball, House, AppSize, LevelConfig } from '../types';
 import { Level1Scene } from './levels/Level1Scene';
 import { Level2Scene } from './levels/Level2Scene';
@@ -40,7 +40,7 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 width={size.width}  
                 height={size.height} 
                 alpha={0.5}
-                /> 
+            /> 
             <Platforms platforms={platforms} levelScroll={levelScroll} />
             <Player player={player} />
             <CommonUI 
@@ -50,6 +50,44 @@ export const GameScene = ({ platforms, player, swipeState, levelScroll, snowball
                 isLevelComplete={isLevelComplete}
                 size={size}
             />
+
+            {/* Win UI */}
+            {isLevelComplete && (
+                <Container>
+                    <Graphics
+                        draw={g => {
+                            g.clear();
+                            g.beginFill(0x000000, 0.7);
+                            g.drawRect(0, 0, size.width, size.height);
+                            g.endFill();
+                        }}
+                    />
+                    <Text 
+                        text="Bravo Stefan!"
+                        anchor={0.5}
+                        x={size.width / 2}
+                        y={size.height / 2 - 50}
+                        style={{ 
+                            fill: 0xFFFFFF,
+                            fontSize: 48,
+                            fontWeight: 'bold'
+                        }}
+                    />
+                    <Text 
+                        text="Mai multe aventuri!"
+                        anchor={0.5}
+                        x={size.width / 2}
+                        y={size.height / 2 + 50}
+                        style={{ 
+                            fill: 0xFFFFFF,
+                            fontSize: 24
+                        }}
+                        interactive={true}
+                        buttonMode={true}
+                        pointerdown={onNextLevel}
+                    />
+                </Container>
+            )}
 
             {/* Swipe indicator */}
             {swipeState.isActive && swipeState.startPoint && (

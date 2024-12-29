@@ -79,15 +79,25 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     // When a level is selected, update all the state
     const onLevelSelect = useCallback((level: string) => {
+        console.log('Starting level:', level);
         const newState = handleLevelSelect(level);
+        
+        // Reset all state for new level
+        setLevelScroll(0);
+        setPlatformConfig(DEFAULT_LEVEL_CONFIGS[level]);
+        
+        // Update all game state with new values
         setPlayer(newState.player);
         setPlatforms(newState.platforms);
         setSnowballs(newState.snowballs);
-        setGifts(newState.gifts);
-        setLevelScroll(newState.levelScroll);
-        setGameState(newState.gameState);
+        setProjectiles([]);
         setSnowmen(newState.snowmen);
+        setGifts(newState.gifts);
         setHouses(newState.houses);
+        setGameState(newState.gameState);
+        
+        // Reset swipe state
+        setSwipeState(createSwipeState());
     }, [handleLevelSelect]);
 
     const checkAndRegenerateContent = useCallback(() => {
@@ -228,6 +238,13 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
     useGameLoop(updateGame);
 
+    const handleGameNextLevel = useCallback(() => {
+        const nextLevel = handleNextLevel();
+        if (nextLevel) {
+            onLevelSelect(nextLevel);
+        }
+    }, [handleNextLevel, onLevelSelect]);
+
     if (!currentLevel || !levelConfig) {
         return (
             <GameEngine onBack={onBack} width={size.width} height={size.height}>
@@ -253,7 +270,7 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
                 timeElapsed={gameState.timeElapsed}
                 goalScore={gameState.goalScore}
                 isLevelComplete={gameState.isLevelComplete}
-                onNextLevel={handleNextLevel}
+                onNextLevel={handleGameNextLevel}
                 currentLevel={currentLevel}
                 currentLevelConfig={levelConfig}
                 projectiles={projectiles}

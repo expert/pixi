@@ -12,7 +12,6 @@ interface Level1SceneProps {
 export const Level1Scene = ({ snowballs, levelScroll, size }: Level1SceneProps) => {
     return (
       <Container>
-       
         <Container x={levelScroll}>
             <Graphics
                 draw={g => {

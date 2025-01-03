@@ -63,15 +63,17 @@ export const useLevel2State = (initialState: {
 
       // Update snowmen
       let updatedSnowmen = SnowmanSystem.updateSnowmen(prevState.snowmen, deltaTime, size);
-      
+      console.log('updatedSnowmen', updatedSnowmen)
       // Generate new snowmen if needed
       if (SnowmanSystem.shouldGenerateNewSnowman(updatedSnowmen, prevState.goalScore, prevState.score, size)) {
         const newSnowman = SnowmanSystem.generateSnowman(size);
+        console.log('newSnowman', newSnowman);
         updatedSnowmen = [...updatedSnowmen, newSnowman];
       }
 
       // Check hits
       const { hits, remainingSnowmen } = SnowmanSystem.checkSnowmanHits(activeProjectiles, updatedSnowmen);
+      console.log('remainingSnowmen', remainingSnowmen)
       return {
         ...prevState,
         projectiles: activeProjectiles,

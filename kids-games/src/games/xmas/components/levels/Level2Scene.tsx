@@ -11,8 +11,7 @@ interface Level2SceneProps {
 }
 
 export const Level2Scene = ({ projectiles, snowmen, size }: Level2SceneProps) => {
-    
-    return (
+  return (
         <Container>
             <Graphics
                 draw={g => {

@@ -9,7 +9,7 @@ import {
 export class SnowmanSystem {
     static generateSnowman(size: AppSize): Snowman {
         const x = Math.random() * (size.width - 100) + 50;
-        const y = -50;
+        const y = 150;
         const snowman = createSnowman(x, y);
         return snowman;
     }
@@ -23,7 +23,6 @@ export class SnowmanSystem {
         ).length;
         
         const remainingNeeded = goalScore - currentScore;
-        
         // Generate more frequently when fewer snowmen are active
         return activeSnowmen < 3 && remainingNeeded > 0;
     }

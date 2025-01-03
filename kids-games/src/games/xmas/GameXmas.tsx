@@ -99,34 +99,6 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         setSwipeState(createSwipeState());
     }, [handleLevelSelect]);
 
-    const checkAndRegenerateContent = useCallback(() => {
-        switch (currentLevel) {
-            case 'LEVEL_1':
-                setPlatformConfig(DEFAULT_LEVEL_CONFIGS[currentLevel]);
-                setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, DEFAULT_LEVEL_CONFIGS.LEVEL_1, size)
-                );
-                break;
-            
-            case 'LEVEL_2':
-                setPlatformConfig(DEFAULT_LEVEL_CONFIGS[currentLevel]);
-                setPlatforms(prev => 
-                    regeneratePlatforms(prev, levelScroll, DEFAULT_LEVEL_CONFIGS.LEVEL_2, size)
-                );
-                setSnowmen(prev => prev.filter(s => 
-                    !s.hit && s.x + levelScroll > -size.width
-                ));
-                break;
-        }
-    }, [
-        currentLevel, 
-        levelScroll, 
-        platformConfig,
-        size,
-        gameState.score,
-        gameState.goalScore
-    ]);
-
     const handleSwipe = useCallback((newSwipeState: SwipeState) => {
         switch (currentLevel) {
             case 'LEVEL_1':
@@ -156,7 +128,9 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
 
         // Common platform-based level updates
         const updatePlatformBasedLevel = () => {
-            checkAndRegenerateContent();
+            setPlatforms(prev => 
+                regeneratePlatforms(prev, levelScroll, DEFAULT_LEVEL_CONFIGS[currentLevel], size)
+            );
             setLevelScroll(prev => prev + (platformConfig?.scrollSpeed || 0) * deltaTime);
             setPlatforms(prev => updatePlatforms(prev, deltaTime, platformConfig?.scrollSpeed || 0));
             setPlayer(prev => PhysicsSystem.updatePlayerPhysics(
@@ -233,7 +207,6 @@ const GameXmas = ({ onBack }: GameXmasProps) => {
         updateLevel2, level2State,
         updateLevel3, level3State, updateLevel3Player,
         updateLevel4, level4State, updateLevel4Player,
-        checkAndRegenerateContent
     ]);
 
     useGameLoop(updateGame);

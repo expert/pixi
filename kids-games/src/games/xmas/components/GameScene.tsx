@@ -30,7 +30,25 @@ interface GameSceneProps {
     size: AppSize;
 }
 
-export const GameScene = ({ platforms, player, swipeState, levelScroll, snowballs, score, timeElapsed, goalScore, isLevelComplete, onNextLevel, currentLevel, currentLevelConfig, projectiles, snowmen, gifts, houses, size }: GameSceneProps) => {
+export const GameScene = ({
+    platforms,
+    player,
+    swipeState,
+    levelScroll,
+    snowballs,
+    score,
+    timeElapsed,
+    goalScore,
+    isLevelComplete,
+    onNextLevel,
+    currentLevel,
+    currentLevelConfig,
+    projectiles,
+    snowmen,
+    gifts,
+    houses,
+    size
+}: GameSceneProps) => {
     return (
         <Container>
             {/* Common elements */}
